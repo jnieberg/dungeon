@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Procedural and Deterministic Dungeon Generator 2</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
+    <script type="text/javascript" src="js/three.min.js"></script>
+    <script type="text/javascript" src="js/DDSLoader.js"></script>
+    <script type="text/javascript" src="js/ctm/lzma.js"></script>
+    <script type="text/javascript" src="js/ctm/ctm.js"></script>
+    <script type="text/javascript" src="js/ctm/CTMLoader.js"></script>
+    <script type="text/javascript" src="js/tween.min.js"></script>
+    <script type="text/javascript" src="js/stats.min.js"></script>
+    <script type="text/javascript" src="js/gameState.js"></script>
+    <script type="text/javascript" src="js/machineInfo.js"></script>
+    <script type="text/javascript" src="js/PointerLockControls.js"></script>
+    <script type="text/javascript" src="js/DeviceOrientationControls.js"></script>
+    <script type="text/javascript" src="js/StereoEffect.js"></script>
+    <!--<script type="text/javascript" src="js/Chromanin.js"></script>-->
+
+	<style>
+		html, body, input[type=button], input[type=text] {
+			font-family: Arial;
+			font-size: 11px;
+			margin: 0;
+		}
+		body {
+			margin: 10px;
+		}
+		/*#view {
+			visibility: hidden;
+		}*/
+		#loading {
+			width: 202px;
+			height: 12px;
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			margin: auto;
+			border: solid 1px #ffbb44;
+			display: none;
+			-webkit-border-radius: 6px;
+			-moz-border-radius: 6px;
+			border-radius: 6px;
+			-webkit-box-shadow: 0 0 4px 0 #000;
+			-moz-box-shadow: 0 0 4px 0 #000;
+			box-shadow: 0 0 4px 0 #000;
+		}
+		#loading:after {
+			content: "";
+			width: 0;
+			position: absolute;
+			top: 0;
+			width: 202px;
+			height: 12px;
+			-webkit-border-radius:   5px;
+			-moz-border-radius:      5px;
+			border-radius:           5px;
+			display: block;
+			z-index: 2;
+			-moz-box-shadow:    inset 0 0 3px 2px rgba(0, 0, 128, 0.75);
+   			-webkit-box-shadow: inset 0 0 3px 2px rgba(0, 0, 128, 0.75);
+   			box-shadow:         inset 0 0 3px 2px rgba(0, 0, 128, 0.75);
+			/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ffffff+0,ffffff+100&amp;0+0,1+8,1+10,0+35,0.3+100 */
+			background: -moz-linear-gradient(top,  rgba(255,255,255,0) 0%, rgba(255,255,255,1) 8%, rgba(255,255,255,1) 10%, rgba(255,255,255,0) 35%, rgba(255,255,255,0.3) 100%); /* FF3.6+ */
+			background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0)), color-stop(8%,rgba(255,255,255,1)), color-stop(10%,rgba(255,255,255,1)), color-stop(35%,rgba(255,255,255,0)), color-stop(100%,rgba(255,255,255,0.3))); /* Chrome,Safari4+ */
+			background: -webkit-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 8%,rgba(255,255,255,1) 10%,rgba(255,255,255,0) 35%,rgba(255,255,255,0.3) 100%); /* Chrome10+,Safari5.1+ */
+			background: -o-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 8%,rgba(255,255,255,1) 10%,rgba(255,255,255,0) 35%,rgba(255,255,255,0.3) 100%); /* Opera 11.10+ */
+			background: -ms-linear-gradient(top,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 8%,rgba(255,255,255,1) 10%,rgba(255,255,255,0) 35%,rgba(255,255,255,0.3) 100%); /* IE10+ */
+			background: linear-gradient(to bottom,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 8%,rgba(255,255,255,1) 10%,rgba(255,255,255,0) 35%,rgba(255,255,255,0.3) 100%); /* W3C */
+			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', endColorstr='#4dffffff',GradientType=0 ); /* IE6-9 */
+		}
+		#loading > .bar {
+			z-index: 1;
+			position: absolute;
+			top: 0;
+			width: 0;
+			height: 10px;
+			margin: 1px;
+			-webkit-border-radius:   5px;
+			-moz-border-radius:      5px;
+			border-radius:           5px;
+			display: block;
+			/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#0044ff+0,44aaff+92,ffffff+98,ffffff+100 */
+			background: #0044ff; /* Old browsers */
+			background: -moz-linear-gradient(left,  #0044ff 0%, #44aaff 92%, #ffffff 98%, #ffffff 100%); /* FF3.6+ */
+			background: -webkit-gradient(linear, left top, right top, color-stop(0%,#0044ff), color-stop(92%,#44aaff), color-stop(98%,#ffffff), color-stop(100%,#ffffff)); /* Chrome,Safari4+ */
+			background: -webkit-linear-gradient(left,  #0044ff 0%,#44aaff 92%,#ffffff 98%,#ffffff 100%); /* Chrome10+,Safari5.1+ */
+			background: -o-linear-gradient(left,  #0044ff 0%,#44aaff 92%,#ffffff 98%,#ffffff 100%); /* Opera 11.10+ */
+			background: -ms-linear-gradient(left,  #0044ff 0%,#44aaff 92%,#ffffff 98%,#ffffff 100%); /* IE10+ */
+			background: linear-gradient(to right,  #0044ff 0%,#44aaff 92%,#ffffff 98%,#ffffff 100%); /* W3C */
+			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0044ff', endColorstr='#ffffff',GradientType=1 ); /* IE6-9 */
+			opacity: 0.75;
+			-moz-opacity: 0.75;
+			filter: alpha(opacity=75);
+		}
+		#loading > .light {
+			z-index: 3;
+			position: absolute;
+			width: 6px;
+			height: 6px;
+			-webkit-border-radius:   5px;
+			-moz-border-radius:      5px;
+			border-radius:           5px;
+			background: #fff;
+			top: 3px;
+			-moz-box-shadow:    0 0 10px 5px #fff;
+   			-webkit-box-shadow: 0 0 10px 5px #fff;
+   			box-shadow:         0 0 10px 5px #fff;
+			opacity: 0.0;
+			-moz-opacity: 0.0;
+			filter: alpha(opacity=0);
+		}
+		#map, #main {
+			float: left;
+			position: relative;
+		}
+		#log {
+			font-size: 10px;
+			font-family: Courier New;
+			color: #f00;
+			clear: both;
+			height: 200px;
+			overflow-y: auto;
+		}
+		#canvas {
+			margin: 0 0 0 10px;
+		}
+		#coordinates {
+			width: 50%;
+			margin: 10px 0 0;
+		}
+		#stats {
+			left: auto !important;
+			right: 0;
+		}
+		input[type=text], input[type=button] {
+			border: none;
+			padding: 0 10px;
+			line-height: 32px;
+			height: 32px;
+		}
+	</style>
+</head>
+<body style="background:#000000;">
+	<div id="main">
+		<div id="loading"><span class="bar"></span><span class="light"></span></div>
+		<canvas id="view"></canvas><br>
+		<input type="text" id="coordinates" value="">&nbsp;<input type="button" id="reset-game" value="Reset">&nbsp;<input type="button" id="random" value="Random">&nbsp;<input type="button" id="stereo" value="Stereo view"><br>
+		<p style="color: #fff;" id="debug"></p>
+	</div>
+	<div id="map">
+		<canvas id="canvas"></canvas><br>
+	</div>
+</body>
+<script type="x-shader/x-fragment" id="fragmentShaderDepth">
+
+
+			#include <packing>
+
+			uniform sampler2D texture;
+			varying vec2 vUV;
+
+			void main() {
+
+				vec4 pixel = texture2D( texture, vUV );
+
+				if ( pixel.a < 0.5 ) discard;
+
+				gl_FragData[ 0 ] = packDepthToRGBA( gl_FragCoord.z );
+
+			}
+		
+</script>
+
+<script type="x-shader/x-vertex" id="vertexShaderDepth">
+
+
+			varying vec2 vUV;
+
+			void main() {
+
+				vUV = uv;
+
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+				gl_Position = projectionMatrix * mvPosition;
+
+			}
+
+		
+</script>
+<script type="text/javascript" src="js/dungeon2.js"></script>
+<script type="text/javascript" src="js/threedee2.js"></script>
+<!--<script type="text/javascript" src="js/texture.js"></script>-->
+<script type="text/javascript">
+$(window).on('beforeunload', function() {
+	saveGame(0, 'autosave');
+});
+</script>
+</html>
