@@ -33,11 +33,13 @@ var mapCtx;
 var loadingManager;
 var loadingCountError = 0;
 var loadingCountTotal = 0;
-
-initPlayer();
-loadGame(0);
+var rollObject = new THREE.Object3D();
+var pitchObject = new THREE.Object3D();
+var yawObject = new THREE.Object3D();
 
 $(function () {
+	initPlayer();
+	loadGame(0);
 	init();
 
 	$(document).keydown(function (e) {
@@ -234,9 +236,9 @@ function parseCoordinates(str) {
 	return or;
 }
 
-function initPlayer(f) {
+function initPlayer(f = false) {
 	var str = '';
-	if (f === 'undefined' || !f) {
+	if (!f) {
 		str = getCookie('playercoordinates');
 	}
 	if (str === '') {
@@ -248,6 +250,8 @@ function initPlayer(f) {
 		setCookie('playercoordinates', 'F: ' + origin.f + ', X: ' + origin.x + ', Y: ' + origin.y + ', D: ' + origin.d, 365);
 	} else {
 		origin = parseCoordinates(str);
+		console.log(origin.d);
+		tdRotateCamera(origin.d);
 	}
 }
 
@@ -818,7 +822,7 @@ function checkLegalWood(x, y, wood) {
 
 function getSquare(x, y) {
 	var c = toMapCoord(x, y);
-	if (typeof map[c.x] !== 'undefined' && typeof map[c.x][c.y] !== 'undefined' && c.x >= 0 && c.x < viewSize && c.y >= 0 && c.y < viewSize) {
+	if (map && typeof map[c.x] !== 'undefined' && typeof map[c.x][c.y] !== 'undefined' && c.x >= 0 && c.x < viewSize && c.y >= 0 && c.y < viewSize) {
 		return map[c.x][c.y];
 	}
 	return null;
