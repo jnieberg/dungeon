@@ -757,7 +757,9 @@ function tdCreateScene() {
 		//scene.add(controls.getObject());
 	} else {
 		controls = new THREE.DeviceOrientationControls(camera);
-		controlsEnabled = true;
+		if(stereo) {
+			controlsEnabled = true;
+		}
 	}
 
 	scene.add(camera);
@@ -1885,7 +1887,9 @@ function tdUpdateCamera(fast = false) {
 			if (floorAction(origin.x, origin.y, origin.d)) {
 				reloadAll();
 			}
-			//tdUpdateCamera();
+			if(stereo) {
+				tdUpdateCamera();
+			}
 		}
 	}
 
