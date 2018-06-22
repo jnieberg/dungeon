@@ -2,7 +2,7 @@
 //Grate doors:		F: -96109, X: 697844, Y: -835703, D: 2
 //Many lights:		F: 29030, X: 352572, Y: -211505, D: 3
 //FPS test: 		F: 45431, X: -412832, Y: 241472, D: 3
-var debug = true;
+var debug = false;
 var stereo = false;
 var gameLoaded = false;
 var dir = [{ x: 0, y: -1 }, { x: 1, y: 0 }, { x: 0, y: 1 }, { x: -1, y: 0 }];

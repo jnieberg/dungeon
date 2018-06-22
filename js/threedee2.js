@@ -740,10 +740,10 @@ function tdCreateScene() {
 	renderer.gammaInput = true;
 	renderer.gammaOutput = true;
 	//renderer.preserveDrawingBuffer = true;
-	//if (!isMobile) {
-	renderer.shadowMap.enabled = true;
-	renderer.shadowMap.type = THREE.PCFShadowMap;
-	//}
+	if (!isMobile) {
+		renderer.shadowMap.enabled = true;
+		renderer.shadowMap.type = THREE.PCFShadowMap;
+	}
 	//renderer.setSize( canvas.width, canvas.height );
 
 	camera = new THREE.PerspectiveCamera(45, canvas.width / canvas.height, 0.75, tdViewSize);
