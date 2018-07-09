@@ -299,7 +299,6 @@ var tdMaterial = {
 		light: true,
 		lightColor: 'random2',
 		lightDistance: 1,
-		//normal: true,
 		specular: true,
 		specularColor: 0xffffff,
 		shadow: false,
@@ -336,6 +335,15 @@ var tdMaterial = {
 		animate: '1,20',
 		len: 1
 	},
+	'trace': {
+		image: 'trace',
+		color: 'random',
+		shadow: false,
+		transparent: true,
+		opacity: 0.1,
+		blend: THREE.AdditiveBlending,
+		len: 1
+	},
 	'test': {
 		color: '#ff00ff',
 		len: 1
@@ -349,7 +357,7 @@ var tdMeshFix = {
 		x1: 0.2, y1: 0.2, z1: 0.0,
 		x2: 0.6, y2: 0.6, z2: 0.6
 	}]
-}
+};
 
 function tdAnimate() {
 	requestAnimationFrame(tdAnimate);
@@ -757,7 +765,7 @@ function tdCreateScene() {
 		//scene.add(controls.getObject());
 	} else {
 		controls = new THREE.DeviceOrientationControls(camera);
-		if(stereo) {
+		if (stereo) {
 			controlsEnabled = true;
 		}
 	}
@@ -977,6 +985,7 @@ function tdCreateObject(f, x, y) {
 			case 'wall-light-high': x1 = 0.45, y1 = 1.002, z1 = 1.7, x2 = 0.1, y2 = 0.15, z2 = 0.2; type = 'wall-light-high'; mat = 'wall-light'; break;
 			case 'window-high': x1 = 0, y1 = 0.49, z1 = 1, x2 = 1, y2 = 0.02, z2 = 1; type = 'window'; mat = 'window'; seed = 812.93; break;
 			case 'rune': x1 = 0, y1 = 0, z1 = 0.002, x2 = 1, y2 = 1, z2 = 1; type = 'floor-deco'; mat = 'rune'; break;
+			case 'trace': x1 = 0, y1 = 0, z1 = 0.002, x2 = 1, y2 = 1, z2 = 1; type = 'floor-deco'; mat = 'trace'; break;
 			default: break;
 		}
 		var d = parseInt(getSquareDirections(x, y).substring(o, o + 1));
@@ -1887,9 +1896,9 @@ function tdUpdateCamera(fast = false) {
 			if (floorAction(origin.x, origin.y, origin.d)) {
 				reloadAll();
 			}
-			if(stereo) {
-				tdUpdateCamera();
-			}
+		}
+		if (controlsEnabled) {
+			tdUpdateCameraLight();
 		}
 	}
 
