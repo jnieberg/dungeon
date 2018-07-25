@@ -7,8 +7,12 @@
 		"lib": "lib"
 	},
 	"scripts": {
-		"start": "node dungeon",
+		"start": "npm install && node dungeon.js > log.txt",
 		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/jnieberg/dungeon.git"
 	},
 	"author": "",
 	"license": "ISC",
