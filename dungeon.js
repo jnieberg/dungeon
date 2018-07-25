@@ -7,7 +7,7 @@ const https = require('https');
 
 const baseDirectory = __dirname;
 
-const port = process.env.PORT || 8080;
+const port = 80;
 
 var mimetypes = {
 	'.html': 'text/html',
