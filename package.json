@@ -2,7 +2,7 @@
 	"name": "dungeon",
 	"version": "1.0.0",
 	"description": "Procedural and Deterministic Dungeon Generator",
-	"main": "dungeon.js",
+	"main": "index.js",
 	"directories": {
 		"lib": "lib"
 	},
