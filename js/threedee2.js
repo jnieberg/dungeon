@@ -632,36 +632,14 @@ function tdCreateMaterial(ob, i) {
 			if (image.id.indexOf('+') === 0) {
 				(function (ob, i) {
 					setTimeout(function () {
-						// if (!image.uri) {
-						// 	image.uri = {};
-						// }
 						const themeRand = rand(Math.floor(origin.f / 10), 0, 0, 712.83, themeList.length);
 						const themeColorRand = rand(Math.floor(origin.f / 10), 0, 0, 299.11, themeColorList.length);
 						const theme = themeList[themeRand];
 						let themeColor = (themeColorList[themeColorRand] === '') ? '' : ',ic:specific,isc:' + themeColorList[themeColorRand];
 						themeColor = image.extra ? ',' + image.extra : themeColor;
-						//if (typeof image.uri['i' + i] === 'undefined') {
-						//image.uri['i' + i] = '';
-						//var uri = 'https://api.unsplash.com/search/photos?page=' + i + '&per_page=1&' + image.id + '&orientation=squarish&client_id=fe80479d4d6c4382e6ac3ea6197bfa31130372f6b3eaabd67bbc631042ca164f';
-						//var uri = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyB1K-j4sAuqb-0TNdh-LTP-ryg9Cny9YjY&searchType=image&' + image.id + '&cx=007516225275761090844:-ytgx-ra02k&start=' + start + '&num=10&fileType=png&fields=items(image(height,width),link)&imgSize=xlarge';
-						//'ic:trans,itp:lineart'
 						const tdPath = '/' + theme + '/' + image.id.replace(/^\+/, '') + '/' + (themeColorList[themeColorRand] || 'any') + '/' + i + '.png';
 						var uri = '/search?q=' + theme + image.id + '&tbs=ift:png,isz:ex,iszw:1024,iszh:1024' + themeColor + '&tbm=isch&tdPath=' + tdPath;
-						// $.get(uri, function (data) {
-						// 	const images = data.match(/"ou":".*?"/g) || [];
-						// 	if (images.length) {
-						// 		for (let im = 0; im < images.length; im++) {
-						// 			image.uri['i' + (Math.floor(i / 100) * 100 + im)] = unescape(images[im].replace(/^"ou":"(.*?)"$/, '$1'));
-						// 		}
-						// 		console.log('LOAD:', theme, themeColorList[themeColorRand], i, uri, image.uri['i' + i]);
 						tdGetImageData(uri, ob, i, reflection);
-						//setCookie('_tdMaterial', tdMaterial);
-						//	}
-						//});
-						// } else {
-						// 	tdGetImageData(image.uri['i' + i], ob, i, reflection);
-						// 	console.log('CACHE:', theme, themeColorList[themeColorRand], i, theme + image.id + (image.extra || ''), image.uri['i' + i]);
-						// }
 					}, 1);
 				})(ob, i);
 			} else {
