@@ -1,18 +1,13 @@
-const accepts = require('accepts');
 const http = require('http');
 const url = require('url');
 const fs = require('fs');
 const path = require('path');
-const request = require('request');
 const mkdirp = require('mkdirp');
 const https = require('https');
-const brotli = require('iltorb').compressStream;
 
 const baseDirectory = __dirname;
 
 const port = 8080;
-
-let firstTime = true;
 
 var mimetypes = {
 	'.html': 'text/html',
@@ -98,20 +93,6 @@ function parseRequest(req, response) {
 	const requestUrl = url.parse(req.url);
 	fsPathName = requestUrl.pathname === '/' ? '/index.html' : requestUrl.pathname;
 
-	const mimetypes = {
-		'.html': 'text/html',
-		'.js': 'text/javascript',
-		'.css': 'text/css',
-		'.txt': 'text/plain',
-		'.jpg': 'image/jpeg',
-		'.gif': 'image/gif',
-		'.svg': 'image/svg+xml',
-		'.png': 'image/png',
-		'.ico': 'image/x-icon',
-		'.ttf': 'application/x-font-ttf',
-		'.woff': 'application/x-font-woff',
-		'.woff2': 'text/plain'
-	};
 	const ext = path.extname(fsPathName);
 	const mimetype = mimetypes[ext] || 'text/plain';
 
