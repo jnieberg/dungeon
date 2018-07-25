@@ -10,16 +10,8 @@
 		"start": "node dungeon",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/jnieberg/dungeon.git"
-	},
 	"author": "",
 	"license": "ISC",
-	"bugs": {
-		"url": "https://github.com/jnieberg/dungeon/issues"
-	},
-	"homepage": "https://github.com/jnieberg/dungeon#readme",
 	"dependencies": {
 		"fs": "0.0.1-security",
 		"http": "0.0.0",
