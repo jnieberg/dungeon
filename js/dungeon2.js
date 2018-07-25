@@ -49,49 +49,60 @@ $(function () {
 			var d2 = (origin.d + 2) % 4;
 			var d3 = (origin.d + 3) % 4;
 			switch (e.which) {
-				case 82:
-					initPlayer(true); reloadAll(); // r
+				case 82: // r
+					initPlayer(true);
+					reloadAll();
 					break;
 
-				case 65:
-					tdMoveCamera(d3); // a
+				case 65: // a
+					tdMoveCamera(d3);
 					break;
 
 				case 67: // c
 					stereo = stereo ? false : true;
-					if (stereo) requestFullscreen();
+					if (stereo) {
+						requestFullscreen();
+					}
 					tdReloadView();
 					tdUpdateCamera();
 					break;
 
-				case 87:
-					tdMoveCamera(d); // w
+				case 87: // w
+					tdMoveCamera(d);
 					break;
 
-				case 68:
-					tdMoveCamera(d1); // d
+				case 68: // d
+					tdMoveCamera(d1);
 					break;
 
-				case 83:
-					tdMoveCamera(d2); // s
+				case 83: // s
+					tdMoveCamera(d2);
 					break;
 
-				case 81: tdRotateCamera(-1); // q
+				case 81: // q
+					tdRotateCamera(-1);
 					break;
 
-				case 69: tdRotateCamera(1); // e
+				case 69: // e
+					tdRotateCamera(1);
 					break;
 
-				case 33: origin.f++; reloadAll(); // page up
+				case 33: // page up
+					origin.f++;
+					reloadAll();
 					break;
 
-				case 34: origin.f--; reloadAll(); // page down
+				case 34: // page down
+					origin.f--;
+					reloadAll();
 					break;
 
-				case 32: wallAction(origin.x, origin.y, d); // space
+				case 32: // space
+					wallAction(origin.x, origin.y, d);
 					break;
 
-				default: return; // exit this handler for other keys
+				default: // exit this handler for other keys
+					return;
 			}
 		}
 		e.preventDefault();
@@ -247,10 +258,9 @@ function initPlayer(f = false) {
 		var y = (Math.floor(Math.random() * 100000) - 50000) * 100 + 50;
 		var d = Math.floor(Math.random() * 4);
 		origin = { f: f, x: x, y: y, d: d };
-		setCookie('playercoordinates', 'F: ' + origin.f + ', X: ' + origin.x + ', Y: ' + origin.y + ', D: ' + origin.d, 365);
+		setCookie('playercoordinates', 'F: ' + origin.f + ', X: ' + origin.x + ', Y: ' + origin.y + ', D: ' + origin.d);
 	} else {
 		origin = parseCoordinates(str);
-		console.log(origin.d);
 		tdRotateCamera(origin.d);
 	}
 }
@@ -492,7 +502,7 @@ function generateStairs(x, y) {
 		}
 	}
 	if (x.mod(2) === 0 && y.mod(2) === 0) {
-		if (getSquareObj(x, y) === 'floor') {
+		if (getSquareObjs(x, y) === 'floor') {
 			var e = 0;
 			var d1 = 0;
 			for (var d = 0; d < 4; d++) {
@@ -827,30 +837,37 @@ function getSquare(x, y) {
 	}
 	return null;
 }
-function getSquareObj(x, y) {
+function getSquareObjs(x, y) {
 	var s = getSquare(x, y);
-	if (s !== null) {
-		return getSquare(x, y).obj;
+	if (s && s.obj) {
+		return s.obj.split(',');
 	}
-	return 'floor';
+	return ['floor'];
+}
+function getSquareObj(x, y, obj) {
+	var s = getSquare(x, y);
+	if (s && s.obj.split(',').indexOf(obj) > -1) {
+		return true;
+	}
+	return false;
 }
 function getSquareFeatures(x, y) {
 	var s = getSquare(x, y);
-	if (s !== null) {
-		return getSquare(x, y).features;
+	if (s) {
+		return s.features;
 	}
 	return null;
 }
 function getSquareFeature(x, y, feat) {
 	var s = getSquare(x, y);
-	if (s !== null) {
-		return getSquare(x, y).features[feat];
+	if (s) {
+		return s.features[feat];
 	}
 	return false;
 }
 function getSquareDirections(x, y) {
 	var s = getSquare(x, y);
-	if (s !== null) {
+	if (s) {
 		return s.rotation;
 	}
 	return '0';
@@ -865,7 +882,7 @@ function getSquareDirection(x, y, ob) {
 
 function hasSquare(x, y, obf, d) {
 	var dir = true;
-	var object = getSquareObj(x, y).split(',');
+	var object = getSquareObjs(x, y);
 	//var i = object.indexOf(obf);
 	for (var i = 0; i < object.length; i++) {
 		if (typeof d !== 'undefined') {
@@ -914,13 +931,13 @@ function setSquare(x, y, ob, a, d, force, feat) {
 }
 
 function appendSquare(x, y, ob, a, d, force) {
-	var sq = getSquareObj(x, y);
+	var sq = getSquareObjs(x, y).join(',');
 	var dr = getSquareDirections(x, y);
 	return setSquare(x, y, sq + ',' + ob, a, dr + d, force);
 }
 
 function replaceSquare(x, y, ob1, ob2) {
-	var sq = ',' + getSquareObj(x, y);
+	var sq = ',' + getSquareObjs(x, y).join(',');
 	if (typeof ob2 !== 'undefined' && ob2 !== '') {
 		ob2 = ',' + ob2;
 	}
@@ -937,7 +954,7 @@ function equalsSquare(sq1, sq2) {
 
 function replaceSquareIndex(x, y, i, ob) {
 	if (i > -1) {
-		var sq = getSquareObj(x, y).split(',');
+		var sq = getSquareObjs(x, y);
 		if (typeof ob !== 'undefined' && ob !== '') {
 			sq[i] = ob;
 		} else {
@@ -950,7 +967,7 @@ function replaceSquareIndex(x, y, i, ob) {
 
 function setSquareFeature(x, y, feat, val) {
 	var s = getSquare(x, y);
-	if (s !== null) {
+	if (s) {
 		s.features[feat] = val;
 		return true;
 	}
@@ -974,7 +991,7 @@ function drawAll(force, callback) {
 			}
 		}
 
-		drawRect(origin.x, origin.y, 0.2, 0.2, 0.6, 0.6, 0, '#FFFF00');
+		drawRect(origin.x, origin.y, 0.2, 0.2, 0.6, 0.6, 0, '#FFCC00');
 		if (debug) {
 			for (var y = 0; y < viewSize; y++) {
 				for (var x = 0; x < viewSize; x++) {
@@ -998,11 +1015,11 @@ function drawAll(force, callback) {
 }
 
 function drawSquare(x, y) {
-	var ob = getSquareObj(x, y);//map[x - origin.x + Math.floor(mapSize / 2)][y - origin.y + Math.floor(mapSize / 2)].obj;
-	var object = [];
-	if (typeof ob !== 'undefined' && ob !== null) {
-		var object = ob.split(',');
-	}
+	var object = getSquareObjs(x, y);//map[x - origin.x + Math.floor(mapSize / 2)][y - origin.y + Math.floor(mapSize / 2)].obj;
+	// var object = [];
+	// if (typeof ob !== 'undefined' && ob !== null) {
+	// 	var object = ob.split(',');
+	// }
 	for (o = 0; o < object.length; o++) {
 		var d = parseInt(getSquareDirections(x, y).substring(o, o + 1));
 		if (object[o] === '') {
@@ -1028,7 +1045,7 @@ function drawSquare(x, y) {
 		} else if (object[o] === 'floor-deco') {
 			drawRect(x, y, 0.45, 0.25, 0.1, 0.1, d, '#BBBBBB');
 		} else if (object[o] === 'wall-secret') {
-			drawRect(x, y, 0, 0, 1, 1, d, '#777777');
+			drawRect(x, y, 0, 0, 1, 1, d, '#ff00ff');
 		} else if (object[o] === 'stairs-up') {
 			drawRect(x, y, 0, 0, 1, 1, d, '#44FF44');
 		} else if (object[o] === 'stairs-down') {
@@ -1059,17 +1076,19 @@ function drawSquare(x, y) {
 			drawRect(x, y, 0.45, 0, 0.1, 0.1, d, '#FFEE00');
 		} else if (object[o] === 'wall-light-high') {
 			drawRect(x, y, 0.45, 0, 0.1, 0.1, d, '#FFEE00');
+		} else if (object[o] === 'trace') {
+			drawRect(x, y, 0, 0, 1, 1, d, '#FFCC00', 0.5);
 		}
 	}
-	if (getSquareFeature(x, y, 'double') !== 'ceil') {
-		drawRect(x, y, 0, 0, 1, 1, d, '#000000', 0.1);
-	}
-	if (getSquareFeature(x, y, 'protected')) {
-		//drawRect(x, y, 0.45, 0.45, 0.1, 0.1, d, '#ff0000');
-	}
-	if (getSquareFeature(x, y, 'wood')) {
-		//drawRect(x, y, 0, 0, 1, 1, d, '#FF8000', 0.1);
-	}
+	// if (getSquareFeature(x, y, 'double') !== 'ceil') {
+	// 	drawRect(x, y, 0, 0, 1, 1, d, '#000000', 0.1);
+	// }
+	//	if (getSquareFeature(x, y, 'protected')) {
+	//drawRect(x, y, 0.45, 0.45, 0.1, 0.1, d, '#ff0000');
+	//}
+	//if (getSquareFeature(x, y, 'wood')) {
+	//drawRect(x, y, 0, 0, 1, 1, d, '#FF8000', 0.1);
+	//}
 }
 
 //draw recttancle on square, based on a size of 1
@@ -1093,7 +1112,7 @@ function drawRect(x, y, x1, y1, x2, y2, d, col, a) {
 }
 
 function floorAction(x, y, d) {
-	if (getSquare(x, y) && getSquareObj(x, y).split(',').indexOf('trace') === -1) {
+	if (getSquare(x, y) && !getSquareObj(x, y, 'trace')) {
 		appendSquare(x, y, 'trace', '', '', true);
 		setMutation(x, y);
 		tdDraw(origin.f, x, y);
@@ -1306,11 +1325,21 @@ function rand() {
 	return Math.floor(random(sum) * s);
 }
 
-function setCookie(cname, cvalue, exdays) {
-	localStorage.setItem(cname, cvalue);
+function setCookie(cname, cvalue) {
+	if (cname.indexOf('_') === 0) {
+		localStorage.setItem(cname, JSON.stringify(cvalue));
+	} else {
+		localStorage.setItem(cname, cvalue);
+	}
 }
 function getCookie(cname) {
-	return localStorage.getItem(cname) || '';
+	let cvalue;
+	if (cname.indexOf('_') === 0) {
+		cvalue = JSON.parse(localStorage.getItem(cname));
+	} else {
+		cvalue = localStorage.getItem(cname) || '';
+	}
+	return cvalue;
 }
 
 function requestFullscreen() {
@@ -1383,6 +1412,9 @@ function setMutation(x1, y1) {
 	var m = toMapCoord(x1, y1);
 	if (m.x >= 0 && m.x < mapSize && m.y >= 0 && m.y < mapSize) {
 		var k = getMutationKey(origin.f, x1, y1);
+		if (typeof mutation === 'undefined') {
+			mutation = {};
+		}
 		if (typeof mutation[k.f] === 'undefined') {
 			mutation[k.f] = {};
 		}

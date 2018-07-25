@@ -7,6 +7,109 @@ var tdScreenHeight = 600;
 var vertexShader = document.getElementById('vertexShaderDepth').textContent;
 var fragmentShader = document.getElementById('fragmentShaderDepth').textContent;
 var reflectionCube, imageLoader;
+var themeList = [
+	'stone+OR+brick',
+	'nature+OR+natural',
+	'old+OR+medieval',
+	'metal+OR+iron+OR+industrial',
+	'sand',
+	'fabric+OR+cloth',
+	'rustic',
+	'rock',
+	'fantasy+OR+magic+OR+rpg',
+	'scifi+OR+technical+OR+alien+OR+futuristic',
+	'granite+OR+marble',
+	'smooth',
+	'rough',
+	'skyrim+OR+warcraft+OR+game'
+];
+var themeColorList = [
+	'',
+	'',
+	'',
+	'',
+	'',
+	'',
+	'',
+	'',
+	'',
+	'',
+	'',
+	'',
+	'red',
+	'orange',
+	'yellow',
+	'green',
+	'teal',
+	'blue',
+	'purple',
+	'pink',
+	'white',
+	'gray',
+	'black',
+	'brown'
+];
+var imageId = {
+	'wall': {
+		'id': '+texture+wall',
+		'max': 100000 //37
+	},
+	'wallSecret': {
+		'id': '+rune+OR+symbol',
+		'extra': 'ic:trans,itp:lineart',
+		'max': 6
+	},
+	'wallWood': {
+		'id': '+texture+wood',
+		'max': 100000 //21
+	},
+	'door': {
+		'id': '+texture+door',
+		'max': 100000 //21
+	},
+	'floor': {
+		'id': '+texture+floor+OR+ground',
+		'max': 100000 //33
+	},
+	'teleport': {
+		'id': 'teleport',
+		'max': 4
+	},
+	'wallSwitch': {
+		'id': 'wall-switch',
+		'max': 9
+	},
+	'wallDeco': {
+		'id': 'wall-deco',
+		'max': 23
+	},
+	'floorDeco': {
+		'id': 'floor-deco',
+		'max': 10
+	},
+	'obstacle': {
+		'id': 'obstacle',
+		'max': 2
+	},
+	'wallLight': {
+		'id': 'wall-light',
+		'max': 1
+	},
+	'window': {
+		'id': '+painting+OR+glass',
+		'extra': 'ic:color,itp:lineart',
+		'max': 100000
+	},
+	'rune': {
+		'id': '+texture+circle+OR+symbol',
+		'extra': 'ic:trans,itp:lineart',
+		'max': 100000
+	},
+	'trace': {
+		'id': 'trace',
+		'max': 1
+	},
+};
 
 var aryImageLoader = [];
 
@@ -56,177 +159,157 @@ var tdTexture = {};
 var tdGeometry = [];
 var tdMaterial = {
 	'wall': {
-		image: 'wall',
+		image: imageId.wall,
 		normal: true,
 		specular: true,
-		specularColor: 0x808080,
-		len: 37
+		specularColor: 0x808080
 	},
 	'wall2': {
-		image: 'wall',
+		image: imageId.wall,
 		transparent: true,
 		normal: true,
 		specular: true,
 		specularColor: 0x808080,
-		opacity: 0.5,
-		len: 37
+		opacity: 0.5
 	},
 	'wall-x20': {
-		image: 'wall',
+		image: imageId.wall,
 		normal: true,
 		specular: true,
 		specularColor: 0x808080,
-		scale: { x: 2, y: 1 },
-		len: 37
+		scale: { x: 2, y: 1 }
 	},
 	'wall-x01': {
-		image: 'wall',
+		image: imageId.wall,
 		normal: true,
 		specular: true,
 		specularColor: 0x808080,
 		scale: { x: 0.1, y: 1 },
-		translate: { x: 0.45, y: 0 },
-		len: 37
+		translate: { x: 0.45, y: 0 }
 	},
 	'wall-x025': {
-		image: 'wall',
+		image: imageId.wall,
 		normal: true,
 		specular: true,
 		specularColor: 0x808080,
-		scale: { x: 0.25, y: 1 },
-		len: 37
+		scale: { x: 0.25, y: 1 }
 	},
 	'wall-x05': {
-		image: 'wall',
+		image: imageId.wall,
 		normal: true,
 		specular: true,
 		specularColor: 0x808080,
-		scale: { x: 0.5, y: 1 },
-		len: 37
+		scale: { x: 0.5, y: 1 }
 	},
 	'wall-y01': {
-		image: 'wall',
+		image: imageId.wall,
 		normal: true,
 		specular: true,
 		specularColor: 0x808080,
 		scale: { x: 1, y: 0.1 },
-		translate: { x: 0, y: 0.9 },
-		len: 37
+		translate: { x: 0, y: 0.9 }
 	},
 	'wall-x05-y02': {
-		image: 'wall',
+		image: imageId.wall,
 		normal: true,
 		specular: true,
 		specularColor: 0x808080,
-		scale: { x: 0.5, y: 0.2 },
-		len: 37
+		scale: { x: 0.5, y: 0.2 }
 	},
 	'wall-x20-y02': {
-		image: 'wall',
+		image: imageId.wall,
 		normal: true,
 		specular: true,
 		specularColor: 0x808080,
-		scale: { x: 2.0, y: 0.2 },
-		len: 37
+		scale: { x: 2.0, y: 0.2 }
 	},
 	'wall-secret': {
-		image: 'wall-secret',
+		image: imageId.wallSecret,
 		transparent: true,
 		opacity: 0.5,
-		reflection: 0.5,
-		len: 6
+		reflection: 0.5
 	},
 	'wall-wood': {
-		image: 'wall-wood',
+		image: imageId.wallWood,
 		transparent: true,
 		normal: true,
 		specular: true,
-		specularColor: 0x808080,
-		len: 21
+		specularColor: 0x808080
 	},
 	'wall-wood-x05': {
-		image: 'wall-wood',
+		image: imageId.wallWood,
 		transparent: true,
 		normal: true,
 		specular: true,
 		specularColor: 0x808080,
-		scale: { x: 0.5, y: 1 },
-		len: 21
+		scale: { x: 0.5, y: 1 }
 	},
 	'wall-wood-x01': {
-		image: 'wall-wood',
+		image: imageId.wallWood,
 		transparent: true,
 		normal: true,
 		specular: true,
 		specularColor: 0x808080,
 		scale: { x: 0.1, y: 1 },
-		translate: { x: 0.95, y: 0 },
-		len: 21
+		translate: { x: 0.95, y: 0 }
 	},
 	'wall-wood-y01': {
-		image: 'wall-wood',
+		image: imageId.wallWood,
 		transparent: true,
 		normal: true,
 		specular: true,
 		specularColor: 0x808080,
-		scale: { x: 1, y: 0.1 },
-		len: 21
+		scale: { x: 1, y: 0.1 }
 	},
 	'door-wood-left': {
-		image: 'wall-wood',
+		image: imageId.wallWood,
 		transparent: true,
 		normal: true,
 		specular: true,
 		specularColor: 0x808080,
-		scale: { x: 0.25, y: 1 },
-		len: 21
+		scale: { x: 0.25, y: 1 }
 	},
 	'door-wood': {
-		image: 'wall-wood',
+		image: imageId.wallWood,
 		transparent: true,
 		normal: true,
 		specular: true,
 		specularColor: 0x808080,
 		scale: { x: 0.5, y: 0.75 },
-		translate: { x: 0.25, y: 0.0 },
-		len: 21
+		translate: { x: 0.25, y: 0.0 }
 	},
 	'door-wood-right': {
-		image: 'wall-wood',
+		image: imageId.wallWood,
 		transparent: true,
 		normal: true,
 		specular: true,
 		specularColor: 0x808080,
 		scale: { x: 0.25, y: 1 },
-		translate: { x: 0.75, y: 0 },
-		len: 21
+		translate: { x: 0.75, y: 0 }
 	},
 	'door-wood-top': {
-		image: 'wall-wood',
+		image: imageId.wallWood,
 		transparent: true,
 		normal: true,
 		specular: true,
 		specularColor: 0x808080,
 		scale: { x: 0.5, y: 0.25 },
-		translate: { x: 0.25, y: 0.75 },
-		len: 21
+		translate: { x: 0.25, y: 0.75 }
 	},
 	'door': {
-		image: 'door',
+		image: imageId.door,
 		transparent: true,
 		normal: true,
-		reflection: 0.5,
-		len: 21
+		reflection: 0.5
 	},
 	'floor': {
-		image: 'floor',
+		image: imageId.floor,
 		normal: true,
 		specular: true,
-		specularColor: 0x808080,
-		len: 33
+		specularColor: 0x808080
 	},
 	'teleport': {
-		image: 'teleport',
+		image: imageId.teleport,
 		shadow: false,
 		light: true,
 		lightColor: 'random',
@@ -236,11 +319,10 @@ var tdMaterial = {
 		specular: false,
 		blend: THREE.AdditiveBlending,
 		side: THREE.DoubleSide,
-		animate: 'random,40',
-		len: 4
+		animate: 'random,40'
 	},
 	'teleport-up': {
-		image: 'teleport',
+		image: imageId.teleport,
 		shadow: false,
 		light: true,
 		lightColor: 'random',
@@ -250,105 +332,95 @@ var tdMaterial = {
 		specular: false,
 		blend: THREE.AdditiveBlending,
 		side: THREE.DoubleSide,
-		animate: 'move-y,40,-0.05',
-		len: 4
+		animate: 'move-y,40,-0.05'
 	},
 	'wall-switch': {
-		image: 'wall-switch',
+		image: imageId.wallSwitch,
 		transparent: true,
 		normal: true,
 		shadow: false,
-		reflection: 0.5,
-		len: 9
+		reflection: 0.5
 	},
 	'wall-switch-off': {
+		image: imageId.wallSwitch,
 		color: '#333333',
-		image: 'wall-switch',
 		transparent: true,
 		normal: true,
 		shadow: false,
-		reflection: 0.5,
-		len: 9
+		reflection: 0.5
 	},
 	'wall-deco': {
-		image: 'wall-deco',
+		image: imageId.wallDeco,
 		transparent: true,
 		normal: true,
 		specular: true,
 		specularColor: 0x202020,
-		shadow: false,
-		len: 23
+		shadow: false
 	},
 	'floor-deco': {
-		image: 'floor-deco',
+		image: imageId.floorDeco,
 		transparent: true,
 		normal: true,
 		shadow: false,
-		reflection: 0.5,
-		len: 10
+		reflection: 0.5
 	},
 	'obstacle': {
-		image: 'obstacle',
+		image: imageId.obstacle,
 		normal: true,
 		specular: true,
-		specularColor: 0x808080,
-		len: 2
+		specularColor: 0x808080
 	},
 	'ceil-light': {
-		image: 'wall',
+		image: imageId.wall,
 		light: true,
 		lightColor: 'random2',
 		lightDistance: 1,
 		specular: true,
 		specularColor: 0xffffff,
 		shadow: false,
-		reflection: 0.5,
-		len: 37
+		reflection: 0.5
 	},
 	'wall-light': {
-		image: 'wall-light',
+		image: imageId.wallLight,
 		light: true,
 		lightColor: 'random2',
 		lightDistance: 1,
 		normal: true,
 		specular: true,
 		specularColor: 0xffffff,
-		shadow: false,
-		len: 1
+		shadow: false
 	},
 	'window': {
-		image: 'window',
+		image: imageId.window,
 		normal: true,
 		transparent: true,
 		opacity: 0.25,
 		reflection: 0.25,
-		len: 5
+		blend: THREE.NormalBlending
 	},
 	'rune': {
-		image: 'rune',
+		image: imageId.rune,
 		color: 'random',
 		normal: true,
 		specular: true,
 		specularColor: 0x808080,
 		transparent: true,
-		blend: THREE.AdditiveBlending,
-		animate: '1,20',
-		len: 1
+		blend: THREE.NormalBlending,
+		animate: '1,20'
 	},
 	'trace': {
-		image: 'trace',
+		image: imageId.trace,
 		color: 'random',
 		shadow: false,
 		transparent: true,
 		opacity: 0.1,
-		blend: THREE.AdditiveBlending,
-		len: 1
+		blend: THREE.AdditiveBlending
 	},
 	'test': {
-		color: '#ff00ff',
-		len: 1
+		color: '#ff00ff'
 	}
 };
+//setCookie('_tdMaterial', tdMaterial);
 var tdMeshFix = {
 	'obstacle': [{ //statue roman
 		x1: 0.44, y1: 0.55, z1: 0.0,
@@ -370,11 +442,11 @@ function tdAnimate() {
 }
 function tdRender() {
 	for (var ob in tdMaterial) {
-		if (typeof tdMaterial[ob].animate !== 'undefined' && typeof tdTexture[ob] !== "undefined") {
+		if (typeof tdMaterial[ob].animate !== 'undefined' && typeof tdTexture[ob] !== 'undefined') {
 			var at = tdMaterial[ob].animate.split(',');
 			if (timer % Math.floor(60.0 / at[1]) === 0) {
 				for (var i in tdTexture[ob]) {
-					if (typeof tdTexture[ob][i] !== "undefined" && tdTexture[ob][i] !== null) {
+					if (typeof tdTexture[ob][i] !== 'undefined' && tdTexture[ob][i] !== null) {
 						if (at[0] === 'random') {
 							tdTexture[ob][i].offset.x = Math.random();
 							tdTexture[ob][i].offset.y = Math.random();
@@ -389,7 +461,7 @@ function tdRender() {
 		}
 	}
 	setTimeout(function () {
-		for (r in roomLight) {
+		for (let r in roomLight) {
 			if (roomLight[r].makeVisible === 1) {
 				if (!roomLight[r].mesh.visible) {
 					roomLight[r].mesh.visible = true;
@@ -420,9 +492,41 @@ function tdRender() {
 	}
 }
 
+function tdGetImageData(img, ob, i, reflection) {
+	imageLoader.load(img,
+		function (result) {
+			tdMaterial[ob].material['m' + i].extension = 'png';
+			tdUpdateTexture(result, ob, i);
+			var pre = 'norm';
+			if (typeof tdTexture[pre + '-' + ob] === 'undefined') {
+				tdTexture[pre + '-' + ob] = [];
+			}
+			if (typeof tdTexture[pre + '-' + ob][i] === 'undefined') {
+				tdUpdateNormal(result, ob, i, true);
+			}
+			pre = 'spec';
+			if (typeof tdTexture[pre + '-' + ob] === 'undefined') {
+				tdTexture[pre + '-' + ob] = [];
+			}
+			if (typeof tdTexture[pre + '-' + ob][i] === 'undefined') {
+				tdUpdateSpecular(result, ob, i, reflection);
+			}
+		},
+		function () { },
+		function () {
+			tdTexture[ob][i] = null;
+			console.warn('DUNGEON: Texture not found: ' + img);
+			loadingCountError++;
+		}
+	);
+}
+
 function tdCreateMaterial(ob, i) {
+	i = i || 0;
 	var color = new THREE.Color(0xffffff);
-	if (typeof tdMaterial[ob].color !== "undefined") {
+	var image = tdMaterial[ob].image;
+	var img = image.id + '/' + i;
+	if (typeof tdMaterial[ob].color !== 'undefined') {
 		if (tdMaterial[ob].color === 'random') {
 			var h = rand(Math.floor(origin.f / 10), 0, 0, 97.13, 100) * 0.01;
 			var s = 1.0;
@@ -442,44 +546,47 @@ function tdCreateMaterial(ob, i) {
 	emissive += ',' + (rand(Math.floor(origin.f / 10), 0, 0, 843.59, 8));
 	emissive += ',' + (rand(Math.floor(origin.f / 10), 0, 0, 650.22, 8));
 	emissive = new THREE.Color('rgb(' + emissive + ')');
-	if (typeof tdMaterial[ob].emissive !== "undefined") {
+	if (typeof tdMaterial[ob].emissive !== 'undefined') {
 		emissive = new THREE.Color(tdMaterial[ob].emissive);
 		emissiveIntensity = 1;
 	}
-	if (typeof tdMaterial[ob].material === "undefined") {
+	if (typeof tdMaterial[ob].material === 'undefined') {
 		tdMaterial[ob].material = [];
-	} else if (typeof tdMaterial[ob].material[i] !== "undefined") {
-		tdMaterial[ob].material[i].color = color;
-		tdMaterial[ob].material[i].emissive = emissive;
-		return tdMaterial[ob].material[i];
+	} else if (typeof tdMaterial[ob].material['m' + i] !== 'undefined') {
+		tdMaterial[ob].material['m' + i].color = color;
+		tdMaterial[ob].material['m' + i].emissive = emissive;
+		return tdMaterial[ob].material['m' + i];
 	}
-	if (typeof tdMaterial[ob].image !== "undefined" && tdMaterial[ob].image !== '') {
+	if (image && image.id !== '') {
 		var trans = false;
-		if (typeof tdMaterial[ob].transparent !== "undefined" && tdMaterial[ob].transparent) {
+		if (typeof tdMaterial[ob].transparent !== 'undefined' && tdMaterial[ob].transparent) {
 			trans = true;
 		}
 		var opac = 1.0;
-		if (typeof tdMaterial[ob].opacity !== "undefined" && tdMaterial[ob].opacity !== 1.0) {
+		if (typeof tdMaterial[ob].opacity !== 'undefined' && tdMaterial[ob].opacity !== 1.0) {
 			opac = tdMaterial[ob].opacity;
 		}
 		var blend = THREE.NormalBlending;
-		if (typeof tdMaterial[ob].blend !== "undefined") {
+		if (typeof tdMaterial[ob].blend !== 'undefined') {
 			blend = tdMaterial[ob].blend;
 		}
 		var side = THREE.FrontSide;
-		if (typeof tdMaterial[ob].side !== "undefined") {
+		if (typeof tdMaterial[ob].side !== 'undefined') {
 			side = tdMaterial[ob].side;
 		}
 		var reflection = null;
 		var reflectivity = 0.0;
 		var normalScale = new THREE.Vector2(1.2, 1.2);
-		if (typeof tdMaterial[ob].reflection !== "undefined" && tdMaterial[ob].reflection > 0.0) {
+		var bumpScale = 0.02;
+		if (typeof tdMaterial[ob].reflection !== 'undefined' && tdMaterial[ob].reflection > 0.0) {
 			reflection = reflectionCube;
 			reflectivity = tdMaterial[ob].reflection;
-			normalScale = new THREE.Vector2(1.1 - tdMaterial[ob].reflection, 1.1 - tdMaterial[ob].reflection);
+			intensity = (1.0 - reflectivity);
+			normalScale = new THREE.Vector2(intensity, intensity);
+			bumpScale = intensity * 0.02;
 		}
 		var fog = true;
-		//if(typeof tdMaterial[ob].light !== "undefined" && tdMaterial[ob].light) {
+		//if(typeof tdMaterial[ob].light !== 'undefined' && tdMaterial[ob].light) {
 		//emissive = new THREE.Color(0x000000);
 		//emissiveIntensity = 0;
 		//fog = false;
@@ -498,13 +605,14 @@ function tdCreateMaterial(ob, i) {
 				shininess: 0,
 				fog: fog
 			};
-			tdMaterial[ob].material[i] = new THREE.MeshPhongMaterial(parameters);
+			tdMaterial[ob].material['m' + i] = new THREE.MeshPhongMaterial(parameters);
 		} else {
 			var parameters = {
 				color: color,
 				emissive: emissive,
 				emissiveIntensity: emissiveIntensity,
 				normalScale: normalScale,
+				bumpScale: bumpScale,
 				blending: blend,
 				transparent: trans,
 				opacity: opac,
@@ -513,126 +621,154 @@ function tdCreateMaterial(ob, i) {
 				reflectivity: reflectivity,
 				fog: fog
 			};
-			tdMaterial[ob].material[i] = new THREE.MeshPhongMaterial(parameters);
+			tdMaterial[ob].material['m' + i] = new THREE.MeshPhongMaterial(parameters);
 		}
 
-		if (typeof tdTexture[ob] === "undefined") {
+		if (typeof tdTexture[ob] === 'undefined') {
 			tdTexture[ob] = [];
 		}
-		var img = tdMaterial[ob].image + '/' + i;
 
-		if (typeof tdTexture[ob][i] === "undefined") {
-			(function (ob, i) {
-				setTimeout(function () {
-					imageLoader.load(imagePath + imagePathQuality + img + '.jpg',
-						function (image) {
-							tdMaterial[ob].material[i].extension = 'jpg';
-							tdUpdateTexture(image, ob, i);
-						},
-						function () { },
-						function () {
-							loadingCountError++;
-							imageLoader.load(imagePath + imagePathQuality + img + '.png',
-								function (image) {
-									tdMaterial[ob].material[i].extension = 'png';
-									tdUpdateTexture(image, ob, i);
-								},
-								function () { },
-								function () {
-									tdTexture[ob][i] = null;
-									console.warn('DUNGEON: Texture not found: ' + imagePath + imagePathQuality + img);
-									loadingCountError++;
-								}
-							);
+		if (typeof tdTexture[ob][i] === 'undefined') {
+			if (image.id.indexOf('+') === 0) {
+				(function (ob, i) {
+					setTimeout(function () {
+						// if (!image.uri) {
+						// 	image.uri = {};
+						// }
+						const themeRand = rand(Math.floor(origin.f / 10), 0, 0, 712.83, themeList.length);
+						const themeColorRand = rand(Math.floor(origin.f / 10), 0, 0, 299.11, themeColorList.length);
+						const theme = themeList[themeRand];
+						let themeColor = (themeColorList[themeColorRand] === '') ? '' : ',ic:specific,isc:' + themeColorList[themeColorRand];
+						themeColor = image.extra ? ',' + image.extra : themeColor;
+						//if (typeof image.uri['i' + i] === 'undefined') {
+						//image.uri['i' + i] = '';
+						//var uri = 'https://api.unsplash.com/search/photos?page=' + i + '&per_page=1&' + image.id + '&orientation=squarish&client_id=fe80479d4d6c4382e6ac3ea6197bfa31130372f6b3eaabd67bbc631042ca164f';
+						//var uri = 'https://www.googleapis.com/customsearch/v1?key=AIzaSyB1K-j4sAuqb-0TNdh-LTP-ryg9Cny9YjY&searchType=image&' + image.id + '&cx=007516225275761090844:-ytgx-ra02k&start=' + start + '&num=10&fileType=png&fields=items(image(height,width),link)&imgSize=xlarge';
+						//'ic:trans,itp:lineart'
+						const tdPath = '/' + theme + '/' + image.id.replace(/^\+/, '') + '/' + (themeColorList[themeColorRand] || 'any') + '/' + i + '.png';
+						var uri = '/search?q=' + theme + image.id + '&tbs=ift:png,isz:ex,iszw:1024,iszh:1024' + themeColor + '&tbm=isch&tdPath=' + tdPath;
+						// $.get(uri, function (data) {
+						// 	const images = data.match(/"ou":".*?"/g) || [];
+						// 	if (images.length) {
+						// 		for (let im = 0; im < images.length; im++) {
+						// 			image.uri['i' + (Math.floor(i / 100) * 100 + im)] = unescape(images[im].replace(/^"ou":"(.*?)"$/, '$1'));
+						// 		}
+						// 		console.log('LOAD:', theme, themeColorList[themeColorRand], i, uri, image.uri['i' + i]);
+						tdGetImageData(uri, ob, i, reflection);
+						//setCookie('_tdMaterial', tdMaterial);
+						//	}
+						//});
+						// } else {
+						// 	tdGetImageData(image.uri['i' + i], ob, i, reflection);
+						// 	console.log('CACHE:', theme, themeColorList[themeColorRand], i, theme + image.id + (image.extra || ''), image.uri['i' + i]);
+						// }
+					}, 1);
+				})(ob, i);
+			} else {
+				(function (ob, i) {
+					setTimeout(function () {
+						imageLoader.load(imagePath + imagePathQuality + img + '.jpg',
+							function (result) {
+								tdMaterial[ob].material['m' + i].extension = 'jpg';
+								tdUpdateTexture(result, ob, i);
+							},
+							function () { },
+							function () {
+								loadingCountError++;
+								imageLoader.load(imagePath + imagePathQuality + img + '.png',
+									function (result) {
+										tdMaterial[ob].material['m' + i].extension = 'png';
+										tdUpdateTexture(result, ob, i);
+									},
+									function () { },
+									function () {
+										tdTexture[ob][i] = null;
+										console.warn('DUNGEON: Texture not found: ' + imagePath + imagePathQuality + img);
+										loadingCountError++;
+									}
+								);
+							}
+						);
+					}, 1);
+
+					if (typeof tdMaterial[ob].normal !== 'undefined' && tdMaterial[ob].normal) {
+						var pre = 'norm';
+						if (typeof tdTexture[pre + '-' + ob] === 'undefined') {
+							tdTexture[pre + '-' + ob] = [];
 						}
-					);
-					//tdUpdateTexture('texture', ob, i);
-				}, 1);
-			})(ob, i);
+						if (typeof tdTexture[pre + '-' + ob][i] === 'undefined') {
+							(function (ob, i, pre) {
+								setTimeout(function () {
+									imageLoader.load(imagePath + pre + '/' + img + '.jpg',
+										function (result) {
+											tdUpdateNormal(result, ob, i);
+										},
+										function () { },
+										function () {
+											loadingCountError++;
+											console.warn('DUNGEON: Normal not found: ' + imagePath + pre + img);
+										}
+									);
+								}, 50);
+							})(ob, i, pre);
+						}
+					}
+					if (typeof tdMaterial[ob].specular !== 'undefined' && tdMaterial[ob].specular && reflection === null) {
+						var pre = 'spec';
+						if (typeof tdTexture[pre + '-' + ob] === 'undefined') {
+							tdTexture[pre + '-' + ob] = [];
+						}
+						if (typeof tdTexture[pre + '-' + ob][i] === 'undefined') {
+							(function (ob, i, pre) {
+								setTimeout(function () {
+									//var loader = new THREE.ImageLoader(loadingManager);
+									imageLoader.load(imagePath + pre + '/' + img + '.jpg',
+										function (result) {
+											tdUpdateSpecular(result, ob, i, reflection);
+										},
+										function () { },
+										function () {
+											loadingCountError++;
+											console.warn('DUNGEON: Specular not found: ' + imagePath + pre + img);
+										}
+									);
+								}, 100);
+							})(ob, i, pre);
+						}
+					}
+				})(ob, i);
+			}
 		} else if (tdTexture[ob][i] === null) {
 			return null;
 		}
-
-
-		//if (!isMobile) {
-		if (typeof tdMaterial[ob].normal !== "undefined" && tdMaterial[ob].normal) {
-			var pre = 'norm';
-			if (typeof tdTexture[pre + '-' + ob] === "undefined") {
-				tdTexture[pre + '-' + ob] = [];
-			}
-			if (typeof tdTexture[pre + '-' + ob][i] === 'undefined') {
-				(function (ob, i, pre) {
-					setTimeout(function () {
-						//var loader = new THREE.ImageLoader(loadingManager);
-						imageLoader.load(imagePath + pre + '/' + img + '.jpg',
-							function (image) {
-								tdUpdateNormal(image, ob, i);
-							},
-							function () { },
-							function () {
-								loadingCountError++;
-								console.warn('DUNGEON: Normal not found: ' + imagePath + pre + img);
-							}
-						);
-					}, 50);
-				})(ob, i, pre);
-			}
-		}
-		//}
-		//if (!isMobile) {
-		if (typeof tdMaterial[ob].specular !== "undefined" && tdMaterial[ob].specular && reflection === null) {
-			var pre = 'spec';
-			if (typeof tdTexture[pre + '-' + ob] === "undefined") {
-				tdTexture[pre + '-' + ob] = [];
-			}
-			if (typeof tdTexture[pre + '-' + ob][i] === 'undefined') {
-				(function (ob, i, pre) {
-					setTimeout(function () {
-						//var loader = new THREE.ImageLoader(loadingManager);
-						imageLoader.load(imagePath + pre + '/' + img + '.jpg',
-							function (image) {
-								tdUpdateSpecular(image, ob, i);
-							},
-							function () { },
-							function () {
-								loadingCountError++;
-								console.warn('DUNGEON: Specular not found: ' + imagePath + pre + img);
-							}
-						);
-					}, 100);
-				})(ob, i, pre);
-			}
-		}
-		//}
-
-		return tdMaterial[ob].material[i];
+		return tdMaterial[ob].material['m' + i];
 		//i++;
 		//}
-	} else if (typeof tdMaterial[ob].color !== "undefined" && tdMaterial[ob].color !== null) {
-		tdMaterial[ob].material[i] = new THREE.MeshLambertMaterial({ color: color, emissive: emissive, side: THREE.FrontSide });
-		return tdMaterial[ob].material[i];
+	} else if (typeof tdMaterial[ob].color !== 'undefined' && tdMaterial[ob].color !== null) {
+		tdMaterial[ob].material['m' + i] = new THREE.MeshLambertMaterial({ color: color, emissive: emissive, side: THREE.FrontSide });
+		return tdMaterial[ob].material['m' + i];
 	}
 	return null;
 }
 
 function tdUpdateTexture(image, ob, i) {
-	if (typeof tdMaterial[ob].material[i] !== "undefined") {
+	if (typeof tdMaterial[ob].material['m' + i] !== 'undefined') {
 		(function (image, ob, i) {
 			setTimeout(function () {
 				tdTexture[ob][i] = new THREE.Texture();
 				tdTexture[ob][i].image = image;
-				if (typeof tdMaterial[ob].scale !== "undefined") {
+				if (typeof tdMaterial[ob].scale !== 'undefined') {
 					tdTexture[ob][i].repeat.set(tdMaterial[ob].scale.x, tdMaterial[ob].scale.y);
 				}
-				if (typeof tdMaterial[ob].translate !== "undefined") {
+				if (typeof tdMaterial[ob].translate !== 'undefined') {
 					tdTexture[ob][i].offset.x = tdMaterial[ob].translate.x;
 					tdTexture[ob][i].offset.y = tdMaterial[ob].translate.y;
 				}
 				tdTexture[ob][i].wrapT = tdTexture[ob][i].wrapS = THREE.RepeatWrapping;
-				if (typeof tdMaterial[ob].wrapS !== "undefined") {
+				if (typeof tdMaterial[ob].wrapS !== 'undefined') {
 					tdTexture[ob][i].wrapS = tdMaterial[ob].wrapS;
 				}
-				if (typeof tdMaterial[ob].wrapT !== "undefined") {
+				if (typeof tdMaterial[ob].wrapT !== 'undefined') {
 					tdTexture[ob][i].wrapT = tdMaterial[ob].wrapT;
 				}
 				if (!isMobile) {
@@ -642,16 +778,16 @@ function tdUpdateTexture(image, ob, i) {
 				tdTexture[ob][i].minFilter = THREE.LinearMipMapLinearFilter;
 				tdTexture[ob][i].mapping = THREE.UVMapping;
 				tdTexture[ob][i].needsUpdate = true;
-				tdMaterial[ob].material[i].map = tdTexture[ob][i];
-				tdMaterial[ob].material[i].needsUpdate = true;
+				tdMaterial[ob].material['m' + i].map = tdTexture[ob][i];
+				tdMaterial[ob].material['m' + i].needsUpdate = true;
 				/*if(!isMobile) {
-						if(tdMaterial[ob].material[i].map.image.src.endsWith('.png') && typeof tdMaterial['shade-' + ob] !== "undefined" && typeof tdMaterial['shade-' + ob].material !== "undefined" && typeof tdMaterial['shade-' + ob].material[i] !== "undefined") {
-								var uniforms = { texture: { type: "t", value: tdTexture[ob][i] } };
-								tdMaterial['shade-' + ob].material[i].uniforms = uniforms;
-								//tdMaterial['shade-' + ob].material[i].vertexShader = vertexShader;
-								//tdMaterial['shade-' + ob].material[i].fragmentShader = fragmentShader;
-								tdMaterial['shade-' + ob].material[i].needsUpdate = true;
-								tdMaterial['shade-' + ob].material[i].uniforms.texture.needsUpdate = true;
+						if(tdMaterial[ob].material['m' + i].map.image.src.endsWith('.png') && typeof tdMaterial['shade-' + ob] !== 'undefined' && typeof tdMaterial['shade-' + ob].material !== 'undefined' && typeof tdMaterial['shade-' + ob].material['m' + i] !== 'undefined') {
+								var uniforms = { texture: { type: 't', value: tdTexture[ob][i] } };
+								tdMaterial['shade-' + ob].material['m' + i].uniforms = uniforms;
+								//tdMaterial['shade-' + ob].material['m' + i].vertexShader = vertexShader;
+								//tdMaterial['shade-' + ob].material['m' + i].fragmentShader = fragmentShader;
+								tdMaterial['shade-' + ob].material['m' + i].needsUpdate = true;
+								tdMaterial['shade-' + ob].material['m' + i].uniforms.texture.needsUpdate = true;
 						}
 				}*/
 			}, 1);
@@ -659,64 +795,72 @@ function tdUpdateTexture(image, ob, i) {
 	}
 }
 
-function tdUpdateNormal(image, ob, i) {
-	if (typeof tdMaterial[ob].material[i] !== "undefined") {
-		(function (image, ob, i) {
-			setTimeout(function () {
-				tdTexture['norm-' + ob][i] = new THREE.Texture();
-				tdTexture['norm-' + ob][i].image = image;
-				if (typeof tdMaterial[ob].scale !== "undefined") {
-					tdTexture['norm-' + ob][i].repeat.set(tdMaterial[ob].scale.x, tdMaterial[ob].scale.y);
-				}
-				if (typeof tdMaterial[ob].translate !== "undefined") {
-					tdTexture['norm-' + ob][i].offset.x = tdMaterial[ob].translate.x;
-					tdTexture['norm-' + ob][i].offset.y = tdMaterial[ob].translate.y;
-				}
-				tdTexture['norm-' + ob][i].wrapT = tdTexture['norm-' + ob][i].wrapS = THREE.RepeatWrapping;
-				tdTexture['norm-' + ob][i].anisotropy = 16;
-				tdTexture['norm-' + ob][i].needsUpdate = true;
-				tdTexture['norm-' + ob][i].magFilter = THREE.LinearFilter;
-				tdTexture['norm-' + ob][i].minFilter = THREE.LinearMipMapLinearFilter;
-				tdTexture['norm-' + ob][i].mapping = THREE.UVMapping;
-				tdMaterial[ob].material[i].normalMap = tdTexture['norm-' + ob][i];
-				tdMaterial[ob].material[i].needsUpdate = true;
-			}, 1);
-		})(image, ob, i);
+function tdUpdateNormal(image, ob, i, bump = false) {
+	if (typeof tdMaterial[ob].normal !== 'undefined' && tdMaterial[ob].normal) {
+		if (typeof tdMaterial[ob].material['m' + i] !== 'undefined') {
+			(function (image, ob, i) {
+				setTimeout(function () {
+					tdTexture['norm-' + ob][i] = new THREE.Texture();
+					tdTexture['norm-' + ob][i].image = image;
+					if (typeof tdMaterial[ob].scale !== 'undefined') {
+						tdTexture['norm-' + ob][i].repeat.set(tdMaterial[ob].scale.x, tdMaterial[ob].scale.y);
+					}
+					if (typeof tdMaterial[ob].translate !== 'undefined') {
+						tdTexture['norm-' + ob][i].offset.x = tdMaterial[ob].translate.x;
+						tdTexture['norm-' + ob][i].offset.y = tdMaterial[ob].translate.y;
+					}
+					tdTexture['norm-' + ob][i].wrapT = tdTexture['norm-' + ob][i].wrapS = THREE.RepeatWrapping;
+					tdTexture['norm-' + ob][i].anisotropy = 16;
+					tdTexture['norm-' + ob][i].needsUpdate = true;
+					tdTexture['norm-' + ob][i].magFilter = THREE.LinearFilter;
+					tdTexture['norm-' + ob][i].minFilter = THREE.LinearMipMapLinearFilter;
+					tdTexture['norm-' + ob][i].mapping = THREE.UVMapping;
+					if (bump) {
+						tdMaterial[ob].material['m' + i].bumpMap = tdTexture['norm-' + ob][i];
+					} else {
+						tdMaterial[ob].material['m' + i].normalMap = tdTexture['norm-' + ob][i];
+					}
+					tdMaterial[ob].material['m' + i].needsUpdate = true;
+				}, 1);
+			})(image, ob, i);
+		}
 	}
 }
 
-function tdUpdateSpecular(image, ob, i) {
-	if (typeof tdMaterial[ob].material[i] !== "undefined") {
-		(function (image, ob, i) {
-			setTimeout(function () {
-				var col = tdMaterial[ob].specularColor;
-				if (typeof col === "undefined" || col === '') {
-					col = 0x000000;
-				}
-				tdTexture['spec-' + ob][i] = new THREE.Texture();
-				tdTexture['spec-' + ob][i].image = image;
-				if (typeof tdMaterial[ob].scale !== "undefined") {
-					tdTexture['spec-' + ob][i].repeat.set(tdMaterial[ob].scale.x, tdMaterial[ob].scale.y);
-				}
-				if (typeof tdMaterial[ob].translate !== "undefined") {
-					tdTexture['spec-' + ob][i].offset.x = tdMaterial[ob].translate.x;
-					tdTexture['spec-' + ob][i].offset.y = tdMaterial[ob].translate.y;
-				}
-				tdTexture['spec-' + ob][i].wrapT = tdTexture['spec-' + ob][i].wrapS = THREE.RepeatWrapping;
-				tdTexture['spec-' + ob][i].anisotropy = 16;
-				tdTexture['spec-' + ob][i].magFilter = THREE.LinearFilter;
-				tdTexture['spec-' + ob][i].minFilter = THREE.LinearMipMapLinearFilter;
-				tdTexture['spec-' + ob][i].mapping = THREE.UVMapping;
-				tdTexture['spec-' + ob][i].needsUpdate = true;
-				tdMaterial[ob].material[i].specularMap = tdTexture['spec-' + ob][i];
-				tdMaterial[ob].material[i].specular = new THREE.Color(col); //0x302820
-				tdMaterial[ob].material[i].shininess = 10;
-				//tdMaterial[ob].material[i].displacementMap = tdTexture['spec-' + ob][i];
-				//tdMaterial[ob].material[i].displacementScale = 0.036143; // from original model
-				//tdMaterial[ob].material[i].displacementBias = -0.128408; // from original model
-				tdMaterial[ob].material[i].needsUpdate = true;
-			}, 1);
-		})(image, ob, i);
+function tdUpdateSpecular(image, ob, i, reflection) {
+	if (typeof tdMaterial[ob].specular !== 'undefined' && tdMaterial[ob].specular && reflection === null) {
+		if (typeof tdMaterial[ob].material['m' + i] !== 'undefined') {
+			(function (image, ob, i) {
+				setTimeout(function () {
+					var col = tdMaterial[ob].specularColor;
+					if (typeof col === 'undefined' || col === '') {
+						col = 0x000000;
+					}
+					tdTexture['spec-' + ob][i] = new THREE.Texture();
+					tdTexture['spec-' + ob][i].image = image;
+					if (typeof tdMaterial[ob].scale !== 'undefined') {
+						tdTexture['spec-' + ob][i].repeat.set(tdMaterial[ob].scale.x, tdMaterial[ob].scale.y);
+					}
+					if (typeof tdMaterial[ob].translate !== 'undefined') {
+						tdTexture['spec-' + ob][i].offset.x = tdMaterial[ob].translate.x;
+						tdTexture['spec-' + ob][i].offset.y = tdMaterial[ob].translate.y;
+					}
+					tdTexture['spec-' + ob][i].wrapT = tdTexture['spec-' + ob][i].wrapS = THREE.RepeatWrapping;
+					tdTexture['spec-' + ob][i].anisotropy = 16;
+					tdTexture['spec-' + ob][i].magFilter = THREE.LinearFilter;
+					tdTexture['spec-' + ob][i].minFilter = THREE.LinearMipMapLinearFilter;
+					tdTexture['spec-' + ob][i].mapping = THREE.UVMapping;
+					tdTexture['spec-' + ob][i].needsUpdate = true;
+					tdMaterial[ob].material['m' + i].specularMap = tdTexture['spec-' + ob][i];
+					tdMaterial[ob].material['m' + i].specular = new THREE.Color(col); //0x302820
+					tdMaterial[ob].material['m' + i].shininess = 10;
+					//tdMaterial[ob].material['m' + i].displacementMap = tdTexture['spec-' + ob][i];
+					//tdMaterial[ob].material['m' + i].displacementScale = 0.036143; // from original model
+					//tdMaterial[ob].material['m' + i].displacementBias = -0.128408; // from original model
+					tdMaterial[ob].material['m' + i].needsUpdate = true;
+				}, 1);
+			})(image, ob, i);
+		}
 	}
 }
 
@@ -805,7 +949,7 @@ function tdCreateScene() {
 			spr.load(imagePath + 'sprite/' + tdSprite[s].image + '.png', function (tex) {
 				var mat = new THREE.SpriteMaterial({ map: tex, color: 0xffffff, depthWrite: false, depthTest: false, opacity: 0.0 });
 				tdSprite[s].mesh = new THREE.Sprite(mat);
-				if (typeof tdSprite[s].scale !== "undefined") {
+				if (typeof tdSprite[s].scale !== 'undefined') {
 					tdSprite[s].mesh.scale.set(tdSprite[s].scale, tdSprite[s].scale, tdSprite[s].scale);
 				}
 				tdSprite[s].mesh.position.z = -1;
@@ -829,7 +973,7 @@ function tdReloadView() {
 	light.shadow.camera.fov = 45;
 	light.shadow.camera.near = tdSquareSize.x;
 	for (var s in tdSprite) {
-		if (typeof tdSprite[s].mesh !== "undefined") {
+		if (typeof tdSprite[s].mesh !== 'undefined') {
 			tdSprite[s].mesh.material.opacity = 0;
 		}
 	}
@@ -880,7 +1024,7 @@ function tdDraw(f, x, y) {
 function tdDrawAll(force, callback) {
 	//(function(force) {
 	//    setTimeout(function() {
-	if (typeof force !== "undefined" && force) {
+	if (typeof force !== 'undefined' && force) {
 		origin.xt = origin.x;
 		origin.yt = origin.y;
 
@@ -897,16 +1041,16 @@ function tdDrawAll(force, callback) {
 	var i = 0;
 	for (var x = 0; x < viewSize; x++) {
 		for (var y = 0; y < viewSize; y++) {
-			if (typeof map[x] !== "undefined" && typeof map[x][y] !== "undefined") {
+			if (typeof map[x] !== 'undefined' && typeof map[x][y] !== 'undefined') {
 				var c = toRealCoord(x, y);
 				if (origin.x >= c.x - Math.floor(tdViewSize / 2) - 1 && origin.x <= c.x + Math.floor(tdViewSize / 2) + 1 && origin.y >= c.y - Math.floor(tdViewSize / 2) - 1 && origin.y <= c.y + Math.floor(tdViewSize / 2) + 1) {
-					//if(typeof force !== "undefined" || force || typeof scene.getObjectByName(keyLocation(origin.f, origin.x + x, origin.y + y)) === "undefined") {
-					if ((typeof force !== "undefined" && force) || typeof map[x][y].mesh === "undefined" || map[x][y].mesh === null) {
+					//if(typeof force !== 'undefined' || force || typeof scene.getObjectByName(keyLocation(origin.f, origin.x + x, origin.y + y)) === 'undefined') {
+					if ((typeof force !== 'undefined' && force) || typeof map[x][y].mesh === 'undefined' || map[x][y].mesh === null) {
 						tdDraw(origin.f, c.x, c.y);
 						i++;
 					}
 					map[x][y].mesh.visible = true;
-				} else if (typeof map[x][y].mesh !== "undefined" && map[x][y].mesh !== null) {
+				} else if (typeof map[x][y].mesh !== 'undefined' && map[x][y].mesh !== null) {
 					map[x][y].mesh.visible = false;
 				}
 			}
@@ -930,7 +1074,7 @@ function tdDrawAll(force, callback) {
 	}
 	tdUpdateCamera();
 	//console.log('Meshes updated: ' + i);
-	if (typeof callback === "function") {
+	if (typeof callback === 'function') {
 		callback();
 	}
 	//}, 100);
@@ -941,7 +1085,7 @@ function tdCreateObject(f, x, y) {
 	//var xo = x + origin.x;
 	//var yo = y + origin.y;
 	var c = toMapCoord(x, y);
-	var ob = getSquareObj(x, y).split(',');
+	var ob = getSquareObjs(x, y);
 	var ms = null;
 	var ms1 = null;
 	var ms2 = null;
@@ -1029,11 +1173,11 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 	if (metatype !== '') {
 		switch (metatype) {
 			case 'box':
-				i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].len);
+				i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				//i = 38;
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
-					if (typeof tdGeometry[geotype] === "undefined" || tdGeometry[geotype] === null) {
+					if (typeof tdGeometry[geotype] === 'undefined' || tdGeometry[geotype] === null) {
 						geo = new THREE.BoxGeometry(x2, z2, y2, 1, 1);
 						tdGeometry[geotype] = new THREE.BufferGeometry().fromGeometry(geo);
 						tdGeometry[geotype].computeVertexNormals();
@@ -1049,11 +1193,11 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'box4':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].len);
+				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				//i = 38;
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
-					if (typeof tdGeometry[geotype] === "undefined" || tdGeometry[geotype] === null) {
+					if (typeof tdGeometry[geotype] === 'undefined' || tdGeometry[geotype] === null) {
 						geo = new THREE.BoxGeometry(x2, z2, y2, 1, 1);
 						geo.faces.splice(4, 4); //remove top and bottom
 						tdGeometry[geotype] = new THREE.BufferGeometry().fromGeometry(geo);
@@ -1070,11 +1214,11 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'floor':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].len);
+				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				//i = 32;
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
-					if (typeof tdGeometry[geotype] === "undefined" || tdGeometry[geotype] === null) {
+					if (typeof tdGeometry[geotype] === 'undefined' || tdGeometry[geotype] === null) {
 						tdGeometry[geotype] = new THREE.PlaneBufferGeometry(x2, y2, 1, 1);
 						tdGeometry[geotype].computeVertexNormals();
 						//tdBlurGeometry(tdGeometry[geotype]);
@@ -1088,11 +1232,11 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'ceil':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].len);
+				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				//i = 32;
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
-					if (typeof tdGeometry[geotype] === "undefined" || tdGeometry[geotype] === null) {
+					if (typeof tdGeometry[geotype] === 'undefined' || tdGeometry[geotype] === null) {
 						tdGeometry[geotype] = new THREE.PlaneBufferGeometry(x2, y2, 1, 1);
 						tdGeometry[geotype].computeVertexNormals();
 						//tdBlurGeometry(tdGeometry[geotype]);
@@ -1106,10 +1250,10 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'wall-deco':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].len);
+				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
-					if (typeof tdGeometry[geotype] === "undefined" || tdGeometry[geotype] === null) {
+					if (typeof tdGeometry[geotype] === 'undefined' || tdGeometry[geotype] === null) {
 						geo = new THREE.PlaneGeometry(x2, y2, 1, 1);
 						//tdBlurGeometry(geo);
 						tdGeometry[geotype] = new THREE.BufferGeometry().fromGeometry(geo);
@@ -1126,10 +1270,10 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'ramp-reversed':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].len);
+				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
-					if (typeof tdGeometry[geotype] === "undefined" || tdGeometry[geotype] === null) {
+					if (typeof tdGeometry[geotype] === 'undefined' || tdGeometry[geotype] === null) {
 						tdGeometry[geotype] = new THREE.PlaneBufferGeometry(x2, y2, 1, 1);
 						tdGeometry[geotype].computeVertexNormals();
 					}
@@ -1141,10 +1285,10 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'cylinder':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].len);
+				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
-					if (typeof tdGeometry[geotype] === "undefined" || tdGeometry[geotype] === null) {
+					if (typeof tdGeometry[geotype] === 'undefined' || tdGeometry[geotype] === null) {
 						tdGeometry[geotype] = new THREE.CylinderBufferGeometry(x2 * 0.5, y2 * 0.5, z2, 8, 1);
 						tdGeometry[geotype].computeVertexNormals();
 					}
@@ -1155,10 +1299,10 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'cylinder-rx':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].len);
+				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
-					if (typeof tdGeometry[geotype] === "undefined" || tdGeometry[geotype] === null) {
+					if (typeof tdGeometry[geotype] === 'undefined' || tdGeometry[geotype] === null) {
 						tdGeometry[geotype] = new THREE.CylinderBufferGeometry(x2 * 0.5, y2 * 0.5, z2, 8, 1);
 						tdGeometry[geotype].computeVertexNormals();
 					}
@@ -1170,10 +1314,10 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'cylinder-rz':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].len);
+				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
-					if (typeof tdGeometry[geotype] === "undefined" || tdGeometry[geotype] === null) {
+					if (typeof tdGeometry[geotype] === 'undefined' || tdGeometry[geotype] === null) {
 						tdGeometry[geotype] = new THREE.CylinderBufferGeometry(x2 * 0.5, y2 * 0.5, z2, 8, 1);
 						tdGeometry[geotype].computeVertexNormals();
 					}
@@ -1191,7 +1335,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				col += ',' + (rand(f, x, y, 843.59, 127) + 128);
 				col += ',' + (rand(f, x, y, 650.22, 127) + 128);
 				/*m.color = new THREE.Color('rgb(' + col + ')');
-				if(typeof tdGeometry[geotype] === "undefined" || tdGeometry[geotype] === null) {
+				if(typeof tdGeometry[geotype] === 'undefined' || tdGeometry[geotype] === null) {
 						geo = new THREE.SphereGeometry(1, 8, 8);
 						tdGeometry[geotype] = new THREE.BufferGeometry().fromGeometry(geo);
 						tdGeometry[geotype].computeVertexNormals();
@@ -1325,7 +1469,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'pit':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].len);
+				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				ms = new THREE.Object3D();
 				var z3 = 0;
 				if (z1 === 1) {
@@ -1339,7 +1483,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'stairs':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].len);
+				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				ms = new THREE.Object3D();
 				//tdLoadObjectOBJ(metatype, ms, x1, y1, z1, x2, y2, z2, 0, mat, i);
 				for (var s = 0; s < 10; s++) {
@@ -1362,7 +1506,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 					ms1 = tdDrawObject('box', ms, f, x, y, x1 - 0.1, y1 - 0.1, z1 + 0.8, x2 + 0.2, y2 + 0.2, 0.2, 0, 'box', 'wall-x05-y02', rnd, 129.22);
 				} else if (r === 3) {
 					ms1 = tdDrawObject('box4', ms, f, x, y, x1, y1, z1, x2, y2, z2, 0, 'box4', 'wall-x025', rnd, 129.22);
-					//var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].len);
+					//var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 					//ms = new THREE.Object3D();
 					//tdLoadObjectOBJ('pillar', ms, x1, y1, z1, x2, y2, z2, 0, mat, i);
 				} else {
@@ -1382,7 +1526,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'obstacle':
-				var i = rand(f, x, y, seed, tdMaterial[mat].len);
+				var i = rand(f, x, y, seed, tdMaterial[mat].image.max);
 				ms = new THREE.Object3D();
 				tdLoadObjectOBJ(metatype, ms, x1, y1, z1, x2, y2, z2, 0, mat, i, true);
 				break;
@@ -1510,19 +1654,19 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'ceil-light':
-				i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].len);
+				i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				ms = new THREE.Object3D();
 				ms.position.x = (x1 + (x2 / 2)) * tdSquareSize.x - tdSquareSize.x * 0.5;
 				ms.position.y = (z1 + (z2 / 2)) * tdSquareSize.y;
 				ms.position.z = (y1 + (y2 / 2)) * tdSquareSize.x - tdSquareSize.x * 0.5;
 				//m = tdCreateMaterial(mat, 0);
 				//if(m !== null) {
-				//var i = rand(f, x, y, seed, tdMaterial[mat].len);
+				//var i = rand(f, x, y, seed, tdMaterial[mat].image.max);
 				/*var col = (rand(f, x, y, 112.10, 127) + 128);
 				col += ',' + (rand(f, x, y, 843.59, 127) + 128);
 				col += ',' + (rand(f, x, y, 650.22, 127) + 128);
 				m.color = new THREE.Color('rgb(' + col + ')');
-				if(typeof tdGeometry[geotype] === "undefined" || tdGeometry[geotype] === null) {
+				if(typeof tdGeometry[geotype] === 'undefined' || tdGeometry[geotype] === null) {
 						geo = new THREE.SphereGeometry(1, 8, 8);
 						tdGeometry[geotype] = new THREE.BufferGeometry().fromGeometry(geo);
 						tdGeometry[geotype].computeVertexNormals();
@@ -1545,9 +1689,9 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 		}
 		if (ms !== null) {
 			if (mat !== '') {
-				if (typeof tdMaterial[mat].light !== "undefined" && tdMaterial[mat].light) {
+				if (typeof tdMaterial[mat].light !== 'undefined' && tdMaterial[mat].light) {
 					var dist = 1;
-					if (typeof tdMaterial[mat].lightDistance !== "undefined") {
+					if (typeof tdMaterial[mat].lightDistance !== 'undefined') {
 						dist = tdMaterial[mat].lightDistance;
 					}
 					if (tdMaterial[mat].lightColor === 'random') {
@@ -1583,23 +1727,23 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 					//scene.add( ms2 );
 					//console.log('Light added: ' + roomLight.length);
 				}
-				if ((typeof tdMaterial[mat].shadow === "undefined" || tdMaterial[mat].shadow) && (typeof ms.material === "undefined" || ms.material.extension !== "png")) {
+				if ((typeof tdMaterial[mat].shadow === 'undefined' || tdMaterial[mat].shadow) && (typeof ms.material === 'undefined' || ms.material.extension !== 'png')) {
 					ms.castShadow = true;
 					if (!isMobile) {
-						if (typeof tdMaterial[mat].transparent !== "undefined" && tdMaterial[mat].transparent && typeof ms.material !== "undefined" && typeof i !== "undefined" && typeof ms.material !== "undefined" && ms.material.extension === "png") {
-							if (typeof tdMaterial['shade-' + mat] === "undefined") {
+						if (typeof tdMaterial[mat].transparent !== 'undefined' && tdMaterial[mat].transparent && typeof ms.material !== 'undefined' && typeof i !== 'undefined' && typeof ms.material !== 'undefined' && ms.material.extension === 'png') {
+							if (typeof tdMaterial['shade-' + mat] === 'undefined') {
 								tdMaterial['shade-' + mat] = {};
 								tdMaterial['shade-' + mat].material = [];
 								var uniforms = {
 									texture: { type: 't', value: tdTexture[mat][i] }
 								};
-								tdMaterial['shade-' + mat].material[i] = new THREE.ShaderMaterial({
+								tdMaterial['shade-' + mat].material['m' + i] = new THREE.ShaderMaterial({
 									uniforms: uniforms,
 									vertexShader: vertexShader,
 									fragmentShader: fragmentShader
 								});
 							}
-							ms.customDepthMaterial = tdMaterial['shade-' + mat].material[i];
+							ms.customDepthMaterial = tdMaterial['shade-' + mat].material['m' + i];
 							//ms.material.map.needsUpdate = true;
 						}
 					}
@@ -1631,10 +1775,10 @@ function tdBlurGeometry(g) {
 
 function tdLoadObjectOBJ(type, msg, x1, y1, z1, x2, y2, z2, d, mat, i, i2) {
 	var file = type;
-	if (typeof i2 !== "undefined" && i2) {
+	if (typeof i2 !== 'undefined' && i2) {
 		file = file + '-' + i;
 		var mf = tdMeshFix[type][i];
-		if (typeof mf !== "undefined") {
+		if (typeof mf !== 'undefined') {
 			x1 = mf.x1;
 			y1 = mf.y1;
 			z1 = mf.z1;
@@ -1643,20 +1787,20 @@ function tdLoadObjectOBJ(type, msg, x1, y1, z1, x2, y2, z2, d, mat, i, i2) {
 			z2 = mf.z2;
 		}
 	}
-	if (typeof tdGeometryCTM[file] === "undefined" || tdGeometryCTM[file] === null) {
+	if (typeof tdGeometryCTM[file] === 'undefined' || tdGeometryCTM[file] === null) {
 		var loader = new THREE.CTMLoader(true);
 		loader.load('models/' + file + '.ctm', function (geo) {
 			m = tdCreateMaterial(mat, i);
 			var obj = new THREE.Mesh(geo, m);
 			tdFixObject(obj, geo, x1, y1, z1, x2, y2, z2);
 			tdGeometryCTM[file] = geo;//.clone();
-			if (typeof geo !== "undefined") {
+			if (typeof geo !== 'undefined') {
 				obj.traverse(function (ms) {
 					//if(ms instanceof THREE.Mesh) {
 					if (m !== null) {
 						ms.material = m;
 					}
-					if ((typeof tdMaterial[mat].shadow === "undefined" || tdMaterial[mat].shadow) && (typeof ms.material === "undefined" || ms.material.extension !== "png")) {
+					if ((typeof tdMaterial[mat].shadow === 'undefined' || tdMaterial[mat].shadow) && (typeof ms.material === 'undefined' || ms.material.extension !== 'png')) {
 						ms.receiveShadow = true;
 						ms.castShadow = true;
 					}
@@ -1670,13 +1814,13 @@ function tdLoadObjectOBJ(type, msg, x1, y1, z1, x2, y2, z2, d, mat, i, i2) {
 		var geo = tdGeometryCTM[file];//.clone();
 		var obj = new THREE.Mesh(geo, m);
 		tdFixObject(obj, geo, x1, y1, z1, x2, y2, z2);
-		if (typeof geo !== "undefined") {
+		if (typeof geo !== 'undefined') {
 			obj.traverse(function (ms) {
 				//if(ms instanceof THREE.Mesh) {
 				if (m !== null) {
 					ms.material = m;
 				}
-				if ((typeof tdMaterial[mat].shadow === "undefined" || tdMaterial[mat].shadow) && (typeof ms.material === "undefined" || ms.material.extension !== "png")) {
+				if ((typeof tdMaterial[mat].shadow === 'undefined' || tdMaterial[mat].shadow) && (typeof ms.material === 'undefined' || ms.material.extension !== 'png')) {
 					ms.receiveShadow = true;
 					ms.castShadow = true;
 				}
@@ -1698,7 +1842,7 @@ function tdFixObject(obj, geo, x1, y1, z1, x2, y2, z2) {
 	obj.traverse(function (ms) {
 		if (ms instanceof THREE.Mesh) {
 			var pos = ms.geometry.attributes.position.array;
-			if (typeof ms.geometry !== "undefined" && typeof pos !== "undefined") {
+			if (typeof ms.geometry !== 'undefined' && typeof pos !== 'undefined') {
 				for (j = 0; j < pos.length; j += 3) {
 					if (xMin > pos[j]) {
 						xMin = pos[j];
@@ -1741,10 +1885,10 @@ function tdHideWallFaces(ms, x, y) {
 }
 
 function tdMoveCameraXY(x, y, z, abs) {
-	if (typeof x === "undefined") {
+	if (typeof x === 'undefined') {
 		tdMoveCameraXY(-origin.d * (Math.PI / 2), undefined, undefined, true);
 	} else {
-		if (typeof abs !== "undefined" && abs) {
+		if (typeof abs !== 'undefined' && abs) {
 			yawObject.rotation.y = x;
 		} else {
 			yawObject.rotation.y -= x;
@@ -1756,8 +1900,8 @@ function tdMoveCameraXY(x, y, z, abs) {
 			yawObject.rotation.y -= 4.0 * (Math.PI / 2);
 		}
 	}
-	if (typeof y !== "undefined") {
-		if (typeof abs !== "undefined" && abs) {
+	if (typeof y !== 'undefined') {
+		if (typeof abs !== 'undefined' && abs) {
 			pitchObject.rotation.x = y;
 		} else {
 			pitchObject.rotation.x -= y;
@@ -1769,8 +1913,8 @@ function tdMoveCameraXY(x, y, z, abs) {
 			pitchObject.rotation.x = 1.0;
 		}
 	}
-	if (typeof z !== "undefined") {
-		if (typeof abs !== "undefined" && abs) {
+	if (typeof z !== 'undefined') {
+		if (typeof abs !== 'undefined' && abs) {
 			rollObject.rotation.z = z;
 		} else {
 			rollObject.rotation.z -= z;
@@ -1873,7 +2017,7 @@ function tdUpdateCamera(fast = false) {
 		camera.position.y = tdPlayerHeight;
 		camera.position.z = (origin.y - origin.yt) * tdSquareSize.x;
 
-		//if(typeof doc === "undefined" || !doc) {
+		//if(typeof doc === 'undefined' || !doc) {
 		//camera.rotation.y = -Math.PI / 2 * origin.d;
 		//}
 		if (hasSquare(origin.x, origin.y, 'stairs-up') > -1) {
@@ -1905,9 +2049,9 @@ function tdUpdateCamera(fast = false) {
 	//SPRITES
 	if (stereo) {
 		for (var s in tdSprite) {
-			if (typeof tdSprite[s].mesh !== "undefined") {
+			if (typeof tdSprite[s].mesh !== 'undefined') {
 				var vis = 2;
-				if (typeof tdSprite[s].visible !== "undefined") {
+				if (typeof tdSprite[s].visible !== 'undefined') {
 					vis = tdSprite[s].visible(origin.x, origin.y, origin.d, true);
 				}
 				if (vis > 0) {
@@ -1916,15 +2060,15 @@ function tdUpdateCamera(fast = false) {
 						tdSprite[s].mesh.rotation.set(0, 0, 0);
 						tdSprite[s].mesh.rotateY(-dirc.y + (-Math.PI / 2) * (4 + origin.d));
 						tdSprite[s].mesh.rotateX(-dirc.x);
-						if (typeof tdSprite[s].offsetZ !== "undefined") {
+						if (typeof tdSprite[s].offsetZ !== 'undefined') {
 							tdSprite[s].mesh.translateZ(-tdSprite[s].offsetZ);
 						} else {
 							tdSprite[s].mesh.translateZ(-1.0);
 						}
-						if (typeof tdSprite[s].offsetY !== "undefined") {
+						if (typeof tdSprite[s].offsetY !== 'undefined') {
 							tdSprite[s].mesh.translateY(-tdSprite[s].offsetY);
 						}
-						if (typeof tdSprite[s].offsetX !== "undefined") {
+						if (typeof tdSprite[s].offsetX !== 'undefined') {
 							tdSprite[s].mesh.translateX(tdSprite[s].offsetX);
 						}
 						var op = tdGetSpriteOpacity(s);
@@ -1934,7 +2078,7 @@ function tdUpdateCamera(fast = false) {
 								tdSprite[s].mesh.material.opacity += 0.05;
 							}
 							if (sc > tdSprite[s].scale * 1.2) {
-								//if(typeof tdSprite[s].scale !== "undefined") {
+								//if(typeof tdSprite[s].scale !== 'undefined') {
 								//    tdSprite[s].mesh.scale.set(tdSprite[s].scale, tdSprite[s].scale, tdSprite[s].scale);
 								//} else {
 								//    tdSprite[s].mesh.scale.set(1, 1, 1);
@@ -1945,7 +2089,7 @@ function tdUpdateCamera(fast = false) {
 								tdSprite[s].mesh.scale.set(sc * 1.01, sc * 1.01, sc * 1.01);
 							}
 						} else {
-							if (typeof tdSprite[s].scale !== "undefined") {
+							if (typeof tdSprite[s].scale !== 'undefined') {
 								tdSprite[s].mesh.scale.set(tdSprite[s].scale, tdSprite[s].scale, tdSprite[s].scale);
 							} else {
 								tdSprite[s].mesh.scale.set(1, 1, 1);
@@ -1956,15 +2100,15 @@ function tdUpdateCamera(fast = false) {
 						tdSprite[s].mesh.material.opacity = 1.0;
 						tdSprite[s].mesh.position.set(0, 0, 0);
 						tdSprite[s].mesh.rotation.set(0, 0, 0);
-						if (typeof tdSprite[s].offsetZ !== "undefined") {
+						if (typeof tdSprite[s].offsetZ !== 'undefined') {
 							tdSprite[s].mesh.translateZ(-tdSprite[s].offsetZ);
 						} else {
 							tdSprite[s].mesh.translateZ(-1.0);
 						}
-						if (typeof tdSprite[s].offsetY !== "undefined") {
+						if (typeof tdSprite[s].offsetY !== 'undefined') {
 							tdSprite[s].mesh.translateY(-tdSprite[s].offsetY);
 						}
-						if (typeof tdSprite[s].offsetX !== "undefined") {
+						if (typeof tdSprite[s].offsetX !== 'undefined') {
 							tdSprite[s].mesh.translateX(tdSprite[s].offsetX);
 						}
 					}
@@ -1981,7 +2125,7 @@ function tdUpdateCamera(fast = false) {
 		tdUpdateCameraLight();
 		var coo = 'F: ' + origin.f + ', X: ' + origin.x + ', Y: ' + origin.y + ', D: ' + origin.d;
 		$('body input#coordinates').val(coo);
-		setCookie('playercoordinates', coo, 365);
+		setCookie('playercoordinates', coo);
 	}
 }
 
@@ -1999,14 +2143,14 @@ function tdFinetuneCamera() {
 }
 
 function tdUpdateCameraLight() {
-	if (typeof light !== "undefined") {
+	if (typeof light !== 'undefined') {
 		light.shadow.camera.updateMatrix();
 	}
 }
 
 function tdGetSpriteOpacity(id) {
 	op = 0.0;
-	if (typeof tdSprite[id].mesh !== "undefined") {
+	if (typeof tdSprite[id].mesh !== 'undefined') {
 		var canvas = document.getElementById('view');
 		var cx = canvas.width;
 		var cy = canvas.height;
@@ -2053,7 +2197,7 @@ function tdClearWorld() {
 	}
 	for (var x = 0; x < viewSize; x++) {
 		for (var y = 0; y < viewSize; y++) {
-			if (typeof map !== "undefined" && typeof map[x] !== "undefined" && typeof map[x][y] !== "undefined") {
+			if (typeof map !== 'undefined' && typeof map[x] !== 'undefined' && typeof map[x][y] !== 'undefined') {
 				delete map[x][y].mesh;
 			}
 		}
@@ -2061,17 +2205,17 @@ function tdClearWorld() {
 }
 
 function tdClearObject(obj, p) {
-	if (typeof obj !== "undefined" && obj !== null) {
+	if (typeof obj !== 'undefined' && obj !== null) {
 		if (obj !== ambientLight && obj !== light && obj !== camera) {
-			if (typeof p === "undefined") {
+			if (typeof p === 'undefined') {
 				p = scene;
 			}
-			if (typeof obj.children !== "undefined") {
+			if (typeof obj.children !== 'undefined') {
 				for (var c = obj.children.length - 1; c >= 0; c--) {
 					tdClearObject(obj.children[c], obj);
 				}
 			}
-			if ((obj.type === "SpotLight" || obj.type === "PointLight") && (typeof lit === "undefined" || !lit)) {
+			if ((obj.type === 'SpotLight' || obj.type === 'PointLight') && (typeof lit === 'undefined' || !lit)) {
 				for (i in roomLight) {
 					if (obj === roomLight[i].mesh) {
 						roomLight.splice(i, 1);
@@ -2081,11 +2225,11 @@ function tdClearObject(obj, p) {
 				}
 			}
 			p.remove(obj);
-			if (typeof obj.geometry !== "undefined") {
+			if (typeof obj.geometry !== 'undefined') {
 				obj.geometry.dispose();
 			}
-			if (typeof obj.material !== "undefined") {
-				if (typeof obj.material.map !== "undefined" && obj.material.map !== null) {
+			if (typeof obj.material !== 'undefined') {
+				if (typeof obj.material.map !== 'undefined' && obj.material.map !== null) {
 					obj.material.map.dispose();
 				}
 				obj.material.dispose();
