@@ -33,7 +33,7 @@ http.createServer(function (req, response) {
 		response.end();
 		console.log(e.stack);
 	}
-}).listen();
+}).listen(port, host);
 
 console.log('listening on port ' + port);
 
