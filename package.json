@@ -7,7 +7,7 @@
 		"lib": "lib"
 	},
 	"scripts": {
-		"start": "npm install & node dungeon",
+		"start": "node dungeon",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"repository": {
