@@ -7,7 +7,8 @@ const https = require('https');
 
 const baseDirectory = __dirname;
 
-const port = 8080;
+const port = process.env.PORT || 8080;
+const host = process.env.IP || '127.0.0.1';
 
 var mimetypes = {
 	'.html': 'text/html',
@@ -32,7 +33,7 @@ http.createServer(function (req, response) {
 		response.end();
 		console.log(e.stack);
 	}
-}).listen(port);
+}).listen(port, host);
 
 console.log('listening on port ' + port);
 
