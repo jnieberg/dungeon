@@ -7,7 +7,7 @@
 		"lib": "lib"
 	},
 	"scripts": {
-		"start": "npm install && node dungeon.js > log.txt",
+		"start": "npm install",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"repository": {
