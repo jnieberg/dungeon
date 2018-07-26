@@ -115,6 +115,7 @@ function parseRequest(req, response) {
 				mkdirp.sync(pth.dir);
 			}
 			response.writeHead(200, {
+				'Access-Control-Allow-Origin': '*',
 				'Content-Type': 'image/png'
 			});
 			fs.access(pth.dir + '/' + pth.file, fs.constants.F_OK, (notFound) => {
@@ -167,6 +168,7 @@ function parseRequest(req, response) {
 		});
 	} else {
 		response.writeHead(200, {
+			'Access-Control-Allow-Origin': '*',
 			'Content-Type': mimetype
 		});
 		if (fsPathName.match(/\.jpg$/) && !fs.existsSync(baseDirectory + fsPathName)) {
