@@ -7,8 +7,7 @@
 		"lib": "lib"
 	},
 	"scripts": {
-		"start": "cross-env NODE_ENV=production node index.js",
-		"heroku-postbuild": "npm run build"
+		"start": "node index.js"
 	},
 	"repository": {
 		"type": "git",
