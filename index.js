@@ -26,6 +26,26 @@ var mimetypes = {
 	'.woff2': 'text/plain'
 };
 
+var rmdirRec = function (path) {
+	try {
+		if (fs.existsSync(path)) {
+			fs.readdirSync(path).forEach(function (file) {
+				var curPath = path + '/' + file;
+				if (fs.lstatSync(curPath).isDirectory()) { // recurse
+					rmdirRec(curPath);
+				} else { // delete file
+					fs.unlinkSync(curPath);
+				}
+			});
+			fs.rmdirSync(path);
+		}
+	} catch (e) {
+
+	}
+};
+
+rmdirRec(path.resolve('images/_backup'));
+
 express()
 	.use(express.static(path.join(__dirname, 'public')))
 	.get('*', (req, res) => {
@@ -34,16 +54,6 @@ express()
 	.listen(port, () =>
 		console.log('Express is working on port ' + port)
 	);
-
-// http.createServer(function (req, response) {
-// 	try {
-// 		parseRequest(req, response);
-// 	} catch (e) {
-// 		response.writeHead(500);
-// 		response.end();
-// 		console.log(e.stack);
-// 	}
-// }).listen(port, host);
 
 function savePng(uri, dir, file, callback) {
 	(function (uri, dir, file, callback) {

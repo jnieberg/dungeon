@@ -502,7 +502,8 @@ function generateStairs(x, y) {
 		}
 	}
 	if (x.mod(2) === 0 && y.mod(2) === 0) {
-		if (getSquareObjs(x, y) === 'floor') {
+		const obj = getSquareObjs(x, y);
+		if (obj && obj[0] === 'floor') {
 			var e = 0;
 			var d1 = 0;
 			for (var d = 0; d < 4; d++) {

@@ -8,19 +8,18 @@ var vertexShader = document.getElementById('vertexShaderDepth').textContent;
 var fragmentShader = document.getElementById('fragmentShaderDepth').textContent;
 var reflectionCube, imageLoader;
 var themeList = [
+	'',
 	'stone+OR+brick',
 	'nature+OR+natural',
-	'old+OR+medieval',
+	'old+OR+medieval+OR+vintage+OR+castle+OR+kingdom',
 	'metal+OR+iron+OR+industrial',
-	'sand',
+	'sand+OR+egypt+OR+desert',
 	'fabric+OR+cloth',
-	'rustic',
-	'rock',
+	'rock+OR+rustic+OR+concrete',
 	'fantasy+OR+magic+OR+rpg',
 	'scifi+OR+technical+OR+alien+OR+futuristic',
-	'granite+OR+marble',
-	'smooth',
-	'rough',
+	'granite+OR+marble+OR+smooth',
+	'city+OR+urban+OR+street+OR+house+OR+outdoor',
 	'skyrim+OR+warcraft+OR+game'
 ];
 var themeColorList = [
@@ -57,10 +56,14 @@ var imageId = {
 	'wallSecret': {
 		'id': '+rune+OR+symbol',
 		'extra': 'ic:trans,itp:lineart',
-		'max': 6
+		'max': 100000 //6
 	},
 	'wallWood': {
 		'id': '+texture+wood',
+		'max': 100000 //21
+	},
+	'wallWoodDoor': {
+		'id': '+texture+wood+door',
 		'max': 100000 //21
 	},
 	'door': {
@@ -72,20 +75,24 @@ var imageId = {
 		'max': 100000 //33
 	},
 	'teleport': {
-		'id': 'teleport',
-		'max': 4
+		'id': '+sparkles+OR+particles+OR+glitters+OR+dust+-cosmetics',
+		'extra': 'ic:trans',
+		'max': 100000 //4
 	},
 	'wallSwitch': {
-		'id': 'wall-switch',
-		'max': 9
+		'id': '+switch+OR+button+OR+lever',
+		'extra': 'ic:trans,itp:clipart',
+		'max': 100000 //9
 	},
 	'wallDeco': {
-		'id': 'wall-deco',
-		'max': 23
+		'id': '+texture+wall+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+grass+OR+moss+OR+cracks+OR+painting+OR+banner',
+		'extra': 'ic:trans',
+		'max': 100000 //23
 	},
 	'floorDeco': {
-		'id': 'floor-deco',
-		'max': 10
+		'id': '+texture+floor+OR+ground+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+cracks',
+		'extra': 'ic:trans',
+		'max': 100000 //10
 	},
 	'obstacle': {
 		'id': 'obstacle',
@@ -270,7 +277,7 @@ var tdMaterial = {
 		scale: { x: 0.25, y: 1 }
 	},
 	'door-wood': {
-		image: imageId.wallWood,
+		image: imageId.wallWoodDoor,
 		transparent: true,
 		normal: true,
 		specular: true,
@@ -343,7 +350,7 @@ var tdMaterial = {
 	},
 	'wall-switch-off': {
 		image: imageId.wallSwitch,
-		color: '#333333',
+		color: '#222222',
 		transparent: true,
 		normal: true,
 		shadow: false,
@@ -523,7 +530,7 @@ function tdGetImageData(img, ob, i, reflection) {
 
 function tdCreateMaterial(ob, i) {
 	i = i || 0;
-	var color = new THREE.Color(0xffffff);
+	var color = new THREE.Color(0xFFFFFF);
 	var image = tdMaterial[ob].image;
 	var img = image.id + '/' + i;
 	if (typeof tdMaterial[ob].color !== 'undefined') {
@@ -1097,8 +1104,8 @@ function tdCreateObject(f, x, y) {
 			case 'pit-ceil': x1 = 0, y1 = 0, z1 = 1, x2 = 1, y2 = 1, z2 = 1; type = 'pit'; mat = 'floor'; rnd = 100; seed = 51.33; break;
 			case 'stairs-up': x1 = 0, y1 = 0, z1 = 0, x2 = 1, y2 = 1, z2 = 1; type = 'stairs-up'; mat = 'wall'; rnd = 100; break;
 			case 'stairs-down': x1 = 0, y1 = 0, z1 = -1, x2 = 1, y2 = 1, z2 = 1; type = 'stairs-down'; mat = 'wall'; rnd = 100; break;
-			case 'wall-switch': x1 = 0, y1 = 1.002, z1 = 0, x2 = 1, y2 = 1, z2 = 1; type = 'wall-deco'; mat = 'wall-switch'; seed = 123.43; break;
-			case 'wall-switch-off': x1 = 0, y1 = 1.002, z1 = 0, x2 = 1, y2 = 1, z2 = 1; type = 'wall-deco'; mat = 'wall-switch-off'; seed = 123.43; break;
+			case 'wall-switch': x1 = 0.4, y1 = 1.002, z1 = 0.6, x2 = 0.2, y2 = 1, z2 = 0.2; type = 'wall-deco'; mat = 'wall-switch'; seed = 123.43; break;
+			case 'wall-switch-off': x1 = 0.4, y1 = 1.002, z1 = 0.6, x2 = 0.2, y2 = 1, z2 = 0.2; type = 'wall-deco'; mat = 'wall-switch-off'; seed = 123.43; break;
 			case 'wall-deco': x1 = 0, y1 = 1.003, z1 = 0, x2 = 1, y2 = 1, z2 = 1; type = 'wall-deco'; mat = 'wall-deco'; seed = 860.97; break;
 			case 'wall-deco-high': x1 = 0, y1 = 1.003, z1 = 1, x2 = 1, y2 = 1, z2 = 1; type = 'wall-deco'; mat = 'wall-deco'; seed = 443.13; break;
 			case 'floor-deco': x1 = 0, y1 = 0, z1 = 0.003, x2 = 1, y2 = 1, z2 = 1; type = 'floor-deco'; mat = 'floor-deco'; break;
@@ -1232,16 +1239,17 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
 					if (typeof tdGeometry[geotype] === 'undefined' || tdGeometry[geotype] === null) {
-						geo = new THREE.PlaneGeometry(x2, y2, 1, 1);
+						geo = new THREE.PlaneGeometry(x2, z2, 1, 1);
 						//tdBlurGeometry(geo);
 						tdGeometry[geotype] = new THREE.BufferGeometry().fromGeometry(geo);
 						tdGeometry[geotype].computeVertexNormals();
 					}
 					ms = new THREE.Mesh(tdGeometry[geotype], m);
-					ms.scale.set(tdSquareSize.x, tdSquareSize.y, tdSquareSize.y);
-					ms.position.set((x1 + (x2 / 2)) * tdSquareSize.x - tdSquareSize.x * 0.5, (z1 + (z2 / 2)) * tdSquareSize.y, 0);//(0, 0.5, 0);
+					ms.scale.set(tdSquareSize.x, tdSquareSize.y, tdSquareSize.x);
 					ms.rotateY((-(d + 2) * 90) * Math.PI / 180);
-					ms.translateZ(y1 * tdSquareSize.x * 0.5);
+					ms.translateX((x1 + (x2 / 2)) * tdSquareSize.x - tdSquareSize.x * 0.5);
+					ms.translateY((z1 + (z2 / 2)) * tdSquareSize.y);
+					ms.translateZ((y1 + (y2 / 2)) * tdSquareSize.x - tdSquareSize.x);
 					ms.rotateY(((d + 2) * 90) * Math.PI / 180);
 					//ms.translateX(y1 * 0.0);
 				}
