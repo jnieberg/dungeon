@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
 const https = require('https');
+const express = require('express');
 
 const baseDirectory = __dirname;
 
@@ -25,17 +26,24 @@ var mimetypes = {
 	'.woff2': 'text/plain'
 };
 
-http.createServer(function (req, response) {
-	try {
-		parseRequest(req, response);
-	} catch (e) {
-		response.writeHead(500);
-		response.end();
-		console.log(e.stack);
-	}
-}).listen(port, host);
+express()
+	.use(express.static(path.join(__dirname, 'public')))
+	.get('*', (req, res) => {
+		parseRequest(req, res);
+	})
+	.listen(port, () =>
+		console.log('Express is working on port ' + port)
+	);
 
-console.log('listening on port ' + port);
+// http.createServer(function (req, response) {
+// 	try {
+// 		parseRequest(req, response);
+// 	} catch (e) {
+// 		response.writeHead(500);
+// 		response.end();
+// 		console.log(e.stack);
+// 	}
+// }).listen(port, host);
 
 function savePng(uri, dir, file, callback) {
 	(function (uri, dir, file, callback) {
