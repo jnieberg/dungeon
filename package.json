@@ -7,7 +7,7 @@
 		"lib": "lib"
 	},
 	"scripts": {
-		"start": "npm install",
+		"start": "node index",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"repository": {
