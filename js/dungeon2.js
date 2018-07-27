@@ -1046,7 +1046,7 @@ function drawSquare(x, y) {
 		} else if (object[o] === 'floor-deco') {
 			drawRect(x, y, 0.45, 0.25, 0.1, 0.1, d, '#BBBBBB');
 		} else if (object[o] === 'wall-secret') {
-			drawRect(x, y, 0, 0, 1, 1, d, '#ff00ff');
+			drawRect(x, y, 0, 0, 1, 1, d, '#777777');
 		} else if (object[o] === 'stairs-up') {
 			drawRect(x, y, 0, 0, 1, 1, d, '#44FF44');
 		} else if (object[o] === 'stairs-down') {
