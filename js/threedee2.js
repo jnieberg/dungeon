@@ -19,7 +19,7 @@ var themeList = [
 	'fantasy+OR+magic+OR+rpg',
 	'scifi+OR+technical+OR+alien+OR+futuristic',
 	'granite+OR+marble+OR+smooth',
-	'city+OR+urban+OR+street+OR+house+OR+outdoor',
+	'city+OR+urban+OR+street+OR+outdoor',
 	'skyrim+OR+warcraft+OR+game'
 ];
 var themeColorList = [
@@ -67,7 +67,7 @@ var imageId = {
 		'max': 100000 //21
 	},
 	'door': {
-		'id': '+texture+door',
+		'id': '+texture+door+OR+grate',
 		'max': 100000 //21
 	},
 	'floor': {
@@ -90,7 +90,7 @@ var imageId = {
 		'max': 100000 //23
 	},
 	'floorDeco': {
-		'id': '+texture+floor+OR+ground+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+cracks',
+		'id': '+texture+floor+OR+ground+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+cracks+OR+grate',
 		'extra': 'ic:trans',
 		'max': 100000 //10
 	},
@@ -644,8 +644,11 @@ function tdCreateMaterial(ob, i) {
 						const theme = themeList[themeRand];
 						let themeColor = (themeColorList[themeColorRand] === '') ? '' : ',ic:specific,isc:' + themeColorList[themeColorRand];
 						themeColor = image.extra ? ',' + image.extra : themeColor;
-						const tdPath = '/' + theme + '/' + image.id.replace(/^\+/, '') + '/' + (themeColorList[themeColorRand] || 'any') + '/' + i + '.png';
-						var uri = '/search?q=' + theme + image.id + '&tbs=ift:png,isz:ex,iszw:1024,iszh:1024' + themeColor + '&tbm=isch&tdPath=' + tdPath;
+						const tdPath = '/' + (theme || 'any') + '/' + image.id.replace(/^\+/, '') + '/' + (themeColorList[themeColorRand] || 'any') + '/' + i + '.png';
+						// let searchDate = moment('01-01-2008', 'DD-MM-YYYY');
+						// const searchDateString = searchDate.add(rand(origin.f, 0, 0, 13.17, 3650), 'days').format('MM/DD/YYYY');
+						//const uri = '/search?q=' + theme + image.id + '&tbs=ift:png,isz:ex,iszw:1024,iszh:1024,cdr:1,cd_min:' + searchDateString + ',cd_max:' + searchDateString + themeColor + '&tbm=isch&tdPath=' + tdPath;
+						const uri = '/search?q=' + theme + image.id + '&tbs=ift:png,isz:ex,iszw:512,iszh:512' + themeColor + '&tbm=isch&tdPath=' + tdPath;
 						tdGetImageData(uri, ob, i, reflection);
 					}, 1);
 				})(ob, i);

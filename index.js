@@ -69,16 +69,19 @@ function savePng(uri, dir, file, callback) {
 					res.on('end', () => {
 						fs.writeFile(dir + '/' + file, dataPng, 'binary', function (err) {
 							if (err) {
-								throw err;
+								console.log('Error: ' + err.message);
+								callback(null);
+							} else {
+								console.log('PNG SAVED:', file);
+								callback(dataPng);
 							}
-							console.log('PNG SAVED:', file);
-							callback(dataPng);
 						});
 					});
 				})(file, callback);
 
 			}).on('error', (err) => {
 				console.log('Error: ' + err.message);
+				callback(null);
 			});
 		} else {
 			callback(null);
@@ -170,7 +173,7 @@ function parseRequest(req, response) {
 								});
 							});
 							res.on('error', function (err) {
-								response.end(err.message);
+								response.end();
 							});
 						}).on('error', function (err) {
 							response.writeHead(404);
