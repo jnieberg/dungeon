@@ -43,6 +43,8 @@
 	 src="js/DeviceOrientationControls.js"></script>
 	<script type="text/javascript"
 	 src="js/StereoEffect.js"></script>
+	<script type="text/javascript"
+	 src="js/nounlist.js"></script>
 	<!--<script type="text/javascript" src="js/Chromanin.js"></script>-->
 
 	<style>
@@ -185,7 +187,8 @@
 			margin: 0 0 0 10px;
 		}
 
-		#coordinates {
+		#coordinates,
+		#theme {
 			width: 50%;
 			margin: 10px 0 0;
 		}
@@ -213,8 +216,11 @@
 		</div>
 		<canvas id="view"></canvas>
 		<div id="footer">
-			<input type="text"
+			<!-- <input type="text"
 			 id="coordinates"
+			 value="">&nbsp; -->
+			<input type="text"
+			 id="theme"
 			 value="">&nbsp;
 			<input type="button"
 			 id="reset-game"

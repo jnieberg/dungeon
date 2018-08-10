@@ -104,8 +104,8 @@ $(function () {
 				default: // exit this handler for other keys
 					return;
 			}
+			e.preventDefault();
 		}
-		e.preventDefault();
 	});
 
 	$(document).on('click', function (event) {
@@ -116,6 +116,21 @@ $(function () {
 	$('body #coordinates').on('change', function () {
 		origin = parseCoordinates($(this).val());
 		reloadAll();
+	});
+
+	$('body #theme').change(function () {
+		initPlayer(true);
+		let val = $(this).val();
+		val = val.replace(/\W/g, ' ');
+		val = val.replace(/\s+/g, '+');
+		val = val.replace(/\+or\+/gi, '+OR+');
+		themeOverride = val;
+		reloadAll();
+	});
+	$('body #theme').focusin(function () {
+		keysFrozen = true;
+	}).focusout(function () {
+		keysFrozen = false;
 	});
 
 	$('body #random').on('click', function () {
@@ -247,12 +262,13 @@ function parseCoordinates(str) {
 	return or;
 }
 
-function initPlayer(f = false) {
+function initPlayer(force = false) {
 	var str = '';
-	if (!f) {
+	if (!force) {
 		str = getCookie('playercoordinates');
 	}
 	if (str === '') {
+		themeOverride = '';
 		var f = (Math.floor(Math.random() * 100000) - 50000) * 10 + 5;
 		var x = (Math.floor(Math.random() * 100000) - 50000) * 100 + 50;
 		var y = (Math.floor(Math.random() * 100000) - 50000) * 100 + 50;

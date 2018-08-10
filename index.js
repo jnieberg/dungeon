@@ -26,6 +26,9 @@ var mimetypes = {
 	'.woff2': 'text/plain'
 };
 
+let pngPipeline = 0;
+let pngPipelineError = 0;
+
 var rmdirRec = function (path) {
 	try {
 		if (fs.existsSync(path)) {
@@ -46,14 +49,19 @@ var rmdirRec = function (path) {
 
 rmdirRec(path.resolve('images/_backup'));
 
-express()
+const server = express()
 	.use(express.static(path.join(__dirname, 'public')))
 	.get('*', (req, res) => {
 		parseRequest(req, res);
+		// res.setTimeout(1000, function () {
+		// 	pngProgress('error');
+		// });
 	})
 	.listen(port, () =>
 		console.log('Express is working on port ' + port)
 	);
+
+server.timeout = 60000;
 
 function savePng(uri, dir, file, callback) {
 	(function (uri, dir, file, callback) {
@@ -72,7 +80,6 @@ function savePng(uri, dir, file, callback) {
 								console.log('Error: ' + err.message);
 								callback(null);
 							} else {
-								console.log('PNG SAVED:', file);
 								callback(dataPng);
 							}
 						});
@@ -111,6 +118,19 @@ function updateImageList(pth, imageList) {
 	});
 }
 
+function pngProgress(text) {
+	if (text === 'error') {
+		//pngPipeline--;
+		//pngPipelineError++;
+	} else if (text === 'found') {
+		pngPipeline++;
+	} else if (text === 'saved') {
+		pngPipeline--;
+	}
+	//console.log(pngPipeline, pngPipelineError);
+	process.stdout.write('PNG ' + text + ' ' + '.'.repeat(pngPipeline) + '\x1b[31m.\x1b[0m'.repeat(pngPipelineError) + ' \r');
+}
+
 function parseRequest(req, response) {
 	const requestUrl = url.parse(req.url);
 	fsPathName = requestUrl.pathname === '/' ? '/index.html' : requestUrl.pathname;
@@ -119,6 +139,7 @@ function parseRequest(req, response) {
 	const mimetype = mimetypes[ext] || 'text/plain';
 
 	if (fsPathName.indexOf('/search') === 0) {
+		pngProgress('found');
 		const rx = /^.*?[\?&]tdPath=(.*)[\/\\](.*?)($|&.*?$)/;
 		const pth = {
 			dir: path.resolve('images/_backup' + requestUrl.query.replace(rx, '$1')),
@@ -145,6 +166,7 @@ function parseRequest(req, response) {
 						savePng(imageList['i' + parseInt(pth.file)], pth.dir, pth.file, function (png) {
 							fs.readFile(pth.dir + '/' + pth.file, function (er, dataPng) {
 								updateImageList(pth, imageList); // NOT existing image + Found in image list
+								pngProgress('saved');
 								response.end(dataPng);
 							});
 						});
@@ -167,21 +189,25 @@ function parseRequest(req, response) {
 							res.on('end', function () {
 								savePngs(pth, data, imageList, function (img, imageList) {
 									fs.readFile(pth.dir + '/' + pth.file, function (er, dataPng) {
+										pngProgress('saved');
 										updateImageList(pth, imageList); // NOT existing image + NOT found in image list
 										response.end(dataPng);
 									});
 								});
 							});
 							res.on('error', function (err) {
+								pngProgress('error');
 								response.end();
 							});
 						}).on('error', function (err) {
+							pngProgress('error');
 							response.writeHead(404);
 							response.end();
 						}).end();
 					}
 				} else {
 					fs.readFile(pth.dir + '/' + pth.file, function (er, dataPng) { // Existing image + Found in image list
+						pngProgress('saved');
 						response.end(dataPng);
 					});
 				}

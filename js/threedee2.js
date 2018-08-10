@@ -7,46 +7,47 @@ var tdScreenHeight = 600;
 var vertexShader = document.getElementById('vertexShaderDepth').textContent;
 var fragmentShader = document.getElementById('fragmentShaderDepth').textContent;
 var reflectionCube, imageLoader;
-var themeList = [
-	'',
-	'stone+OR+brick',
-	'nature+OR+natural',
-	'old+OR+medieval+OR+vintage+OR+castle+OR+kingdom',
-	'metal+OR+iron+OR+industrial',
-	'sand+OR+egypt+OR+desert',
-	'fabric+OR+cloth',
-	'rock+OR+rustic+OR+concrete',
-	'fantasy+OR+magic+OR+rpg',
-	'scifi+OR+technical+OR+alien+OR+futuristic',
-	'granite+OR+marble+OR+smooth',
-	'city+OR+urban+OR+street+OR+outdoor',
-	'skyrim+OR+warcraft+OR+game'
-];
+// var themeList = [
+// '',
+// 'stone+OR+brick',
+// 'nature+OR+natural',
+// 'old+OR+medieval+OR+vintage+OR+castle+OR+kingdom',
+// 'metal+OR+iron+OR+industrial',
+// 'sand+OR+egypt+OR+desert',
+// 'fabric+OR+cloth',
+// 'rock+OR+rustic+OR+concrete',
+// 'fantasy+OR+magic+OR+rpg',
+// 'scifi+OR+space+OR+science+OR+alien+OR+technical+OR+tech+OR+alien+OR+futuristic+OR+future',
+// 'granite+OR+marble+OR+smooth',
+// 'city+OR+urban+OR+street+OR+outdoor',
+// 'skyrim+OR+warcraft+OR+doom+OR+game'
+// ];
+var themeOverride = '';
 var themeColorList = [
 	'',
-	'',
-	'',
-	'',
-	'',
-	'',
-	'',
-	'',
-	'',
-	'',
-	'',
-	'',
-	'red',
-	'orange',
-	'yellow',
-	'green',
-	'teal',
-	'blue',
-	'purple',
-	'pink',
-	'white',
-	'gray',
-	'black',
-	'brown'
+	// '',
+	// '',
+	// '',
+	// '',
+	// '',
+	// '',
+	// '',
+	// '',
+	// '',
+	// '',
+	// '',
+	// 'red',
+	// 'orange',
+	// 'yellow',
+	// 'green',
+	// 'teal',
+	// 'blue',
+	// 'purple',
+	// 'pink',
+	// 'white',
+	// 'gray',
+	// 'black',
+	// 'brown'
 ];
 var imageId = {
 	'wall': {
@@ -67,11 +68,11 @@ var imageId = {
 		'max': 100000 //21
 	},
 	'door': {
-		'id': '+texture+door+OR+grate',
+		'id': '+texture+door+OR+gate+OR+portcullis',
 		'max': 100000 //21
 	},
 	'floor': {
-		'id': '+texture+floor+OR+ground',
+		'id': '+texture+floor+OR+ground+OR+road',
 		'max': 100000 //33
 	},
 	'teleport': {
@@ -85,12 +86,12 @@ var imageId = {
 		'max': 100000 //9
 	},
 	'wallDeco': {
-		'id': '+texture+wall+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+grass+OR+moss+OR+cracks+OR+painting+OR+banner',
+		'id': '+texture', //+wall+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+grass+OR+moss+OR+cracks+OR+painting+OR+banner
 		'extra': 'ic:trans',
 		'max': 100000 //23
 	},
 	'floorDeco': {
-		'id': '+texture+floor+OR+ground+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+cracks+OR+grate',
+		'id': '+texture', //+floor+OR+ground+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+cracks+OR+grate
 		'extra': 'ic:trans',
 		'max': 100000 //10
 	},
@@ -638,18 +639,18 @@ function tdCreateMaterial(ob, i) {
 		if (typeof tdTexture[ob][i] === 'undefined') {
 			if (image.id.indexOf('+') === 0) {
 				(function (ob, i) {
-					setTimeout(function () {
+					setTimeout(function () { //GOOGLE STARTS HERE!!!
+						//const themeRand = rand(Math.floor(origin.f / 10), 0, 0, 712.83, 1000);
 						const themeRand = rand(Math.floor(origin.f / 10), 0, 0, 712.83, themeList.length);
 						const themeColorRand = rand(Math.floor(origin.f / 10), 0, 0, 299.11, themeColorList.length);
-						const theme = themeList[themeRand];
+						themeOverride = themeOverride || themeList[themeRand];
 						let themeColor = (themeColorList[themeColorRand] === '') ? '' : ',ic:specific,isc:' + themeColorList[themeColorRand];
 						themeColor = image.extra ? ',' + image.extra : themeColor;
-						const tdPath = '/' + (theme || 'any') + '/' + image.id.replace(/^\+/, '') + '/' + (themeColorList[themeColorRand] || 'any') + '/' + i + '.png';
-						// let searchDate = moment('01-01-2008', 'DD-MM-YYYY');
-						// const searchDateString = searchDate.add(rand(origin.f, 0, 0, 13.17, 3650), 'days').format('MM/DD/YYYY');
-						//const uri = '/search?q=' + theme + image.id + '&tbs=ift:png,isz:ex,iszw:1024,iszh:1024,cdr:1,cd_min:' + searchDateString + ',cd_max:' + searchDateString + themeColor + '&tbm=isch&tdPath=' + tdPath;
-						const uri = '/search?q=' + theme + image.id + '&tbs=ift:png,isz:ex,iszw:512,iszh:512' + themeColor + '&tbm=isch&tdPath=' + tdPath;
+						const themePath = themeOverride.replace(/^(?:(.*?\+.*?\+.*?)\+.*?)$|^([^\+]*?)$/g, '$1$2') || 'any';
+						const tdPath = '/' + themePath + '/' + image.id.replace(/^\+/, '') + '/' + (themeColorList[themeColorRand] || 'any') + '/' + i + '.png';
+						const uri = '/search?q=' + themeOverride + image.id + '&tbs=ift:png,isz:ex,iszw:512,iszh:512' + themeColor + '&tbm=isch&tdPath=' + tdPath;
 						tdGetImageData(uri, ob, i, reflection);
+						$('body #theme').val(themeOverride);
 					}, 1);
 				})(ob, i);
 			} else {
@@ -760,11 +761,11 @@ function tdUpdateTexture(image, ob, i) {
 					tdTexture[ob][i].wrapT = tdMaterial[ob].wrapT;
 				}
 				if (!isMobile) {
-					tdTexture[ob][i].anisotropy = 16;
+					tdTexture[ob][i].anisotropy = renderer.capabilities.getMaxAnisotropy();
 				}
 				tdTexture[ob][i].magFilter = THREE.LinearFilter;
 				tdTexture[ob][i].minFilter = THREE.LinearMipMapLinearFilter;
-				tdTexture[ob][i].mapping = THREE.UVMapping;
+				tdTexture[ob][i].mapping = THREE.SphericalReflectionMapping;
 				tdTexture[ob][i].needsUpdate = true;
 				tdMaterial[ob].material['m' + i].map = tdTexture[ob][i];
 				tdMaterial[ob].material['m' + i].needsUpdate = true;
@@ -798,7 +799,7 @@ function tdUpdateNormal(image, ob, i, bump = false) {
 						tdTexture['norm-' + ob][i].offset.y = tdMaterial[ob].translate.y;
 					}
 					tdTexture['norm-' + ob][i].wrapT = tdTexture['norm-' + ob][i].wrapS = THREE.RepeatWrapping;
-					tdTexture['norm-' + ob][i].anisotropy = 16;
+					tdTexture['norm-' + ob][i].anisotropy = renderer.capabilities.getMaxAnisotropy();
 					tdTexture['norm-' + ob][i].needsUpdate = true;
 					tdTexture['norm-' + ob][i].magFilter = THREE.LinearFilter;
 					tdTexture['norm-' + ob][i].minFilter = THREE.LinearMipMapLinearFilter;
@@ -834,7 +835,7 @@ function tdUpdateSpecular(image, ob, i, reflection) {
 						tdTexture['spec-' + ob][i].offset.y = tdMaterial[ob].translate.y;
 					}
 					tdTexture['spec-' + ob][i].wrapT = tdTexture['spec-' + ob][i].wrapS = THREE.RepeatWrapping;
-					tdTexture['spec-' + ob][i].anisotropy = 16;
+					tdTexture['spec-' + ob][i].anisotropy = renderer.capabilities.getMaxAnisotropy();
 					tdTexture['spec-' + ob][i].magFilter = THREE.LinearFilter;
 					tdTexture['spec-' + ob][i].minFilter = THREE.LinearMipMapLinearFilter;
 					tdTexture['spec-' + ob][i].mapping = THREE.UVMapping;
@@ -914,7 +915,7 @@ function tdCreateScene() {
 	var loader = new THREE.DDSLoader();
 	reflectionCube = loader.load('images/envmap2.dds', function (tex) {
 		tex.magFilter = THREE.LinearFilter;
-		tex.minFilter = THREE.LinearFilter;
+		tex.minFilter = THREE.LinearMipMapLinearFilter;
 		tex.mapping = THREE.CubeReflectionMapping;
 	});
 
