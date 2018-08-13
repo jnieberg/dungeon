@@ -96,15 +96,29 @@ function savePng(uri, dir, file, callback) {
 	})(uri, dir, file, callback);
 }
 
+function unicodeToChar(text) {
+	return text.replace(/\\u[\dA-F]{4}/gi,
+		function (match) {
+			return String.fromCharCode(parseInt(match.replace(/\\u/g, ''), 16));
+		});
+}
+
 function savePngs(pth, data, imageList, callback) {
 	const images = data.match(/"ou":".*?"/g) || [];
+	const imagesAlt = data.match(/"tu":".*?"/g) || [];
 	const imageIndex = parseInt(pth.file);
 	const i = imageIndex % images.length;
 	if (images.length && images[i]) {
-		const image = images[i].replace(/"ou":"(.*?)"/, '$1');
+		let image = unicodeToChar(images[i].replace(/"ou":"(.*?)"/, '$1'));
+		if (image.indexOf('x-raw-image:///') === 0) {
+			image = unicodeToChar(imagesAlt[i].replace(/"tu":"(.*?)"/, '$1'));
+		}
 		savePng(image, pth.dir, pth.file, function (png) {
 			for (let im = 0; im < images.length; im++) {
-				const imageThis = images[im].replace(/"ou":"(.*?)"/, '$1');
+				let imageThis = unicodeToChar(images[im].replace(/"ou":"(.*?)"/, '$1'));
+				if (imageThis.indexOf('x-raw-image:///') === 0) {
+					imageThis = unicodeToChar(imagesAlt[im].replace(/"tu":"(.*?)"/, '$1'));
+				}
 				const imageIndexThis = Math.floor(parseInt(pth.file) / images.length) * images.length + im;
 				imageList['i' + imageIndexThis] = imageThis;
 			}

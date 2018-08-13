@@ -60,11 +60,11 @@ var imageId = {
 		'max': 100000 //6
 	},
 	'wallWood': {
-		'id': '+texture+wood',
+		'id': '+texture+wall+OR+wood',
 		'max': 100000 //21
 	},
 	'wallWoodDoor': {
-		'id': '+texture+wood+door',
+		'id': '+texture+wall+OR+wood+door+OR+gate+OR+portcullis',
 		'max': 100000 //21
 	},
 	'door': {
@@ -72,7 +72,11 @@ var imageId = {
 		'max': 100000 //21
 	},
 	'floor': {
-		'id': '+texture+floor+OR+ground+OR+road',
+		'id': '+texture+floor+OR+ceiling+OR+ground+OR+road',
+		'max': 100000 //33
+	},
+	'ceiling': {
+		'id': '+texture+ceiling+OR+floor+OR+plafond',
 		'max': 100000 //33
 	},
 	'teleport': {
@@ -86,12 +90,12 @@ var imageId = {
 		'max': 100000 //9
 	},
 	'wallDeco': {
-		'id': '+texture', //+wall+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+grass+OR+moss+OR+cracks+OR+painting+OR+banner
+		'id': '+decoration+wall', //+wall+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+grass+OR+moss+OR+cracks+OR+painting+OR+banner
 		'extra': 'ic:trans',
 		'max': 100000 //23
 	},
 	'floorDeco': {
-		'id': '+texture', //+floor+OR+ground+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+cracks+OR+grate
+		'id': '+decoration+floor+OR+ceiling', //+floor+OR+ground+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+cracks+OR+grate
 		'extra': 'ic:trans',
 		'max': 100000 //10
 	},
@@ -104,12 +108,12 @@ var imageId = {
 		'max': 1
 	},
 	'window': {
-		'id': '+painting+OR+glass',
-		'extra': 'ic:color,itp:lineart',
+		'id': '+',
+		'extra': 'ic:color',
 		'max': 100000
 	},
 	'rune': {
-		'id': '+texture+circle+OR+symbol',
+		'id': '+',
 		'extra': 'ic:trans,itp:lineart',
 		'max': 100000
 	},
@@ -168,6 +172,12 @@ var tdGeometry = [];
 var tdMaterial = {
 	'wall': {
 		image: imageId.wall,
+		normal: true,
+		specular: true,
+		specularColor: 0x808080
+	},
+	'ceil': {
+		image: imageId.ceiling,
 		normal: true,
 		specular: true,
 		specularColor: 0x808080
@@ -234,7 +244,7 @@ var tdMaterial = {
 	'wall-secret': {
 		image: imageId.wallSecret,
 		transparent: true,
-		opacity: 0.5,
+		opacity: 0.25,
 		reflection: 0.5
 	},
 	'wall-wood': {
@@ -278,7 +288,7 @@ var tdMaterial = {
 		scale: { x: 0.25, y: 1 }
 	},
 	'door-wood': {
-		image: imageId.wallWoodDoor,
+		image: imageId.wallWood,
 		transparent: true,
 		normal: true,
 		specular: true,
@@ -524,6 +534,7 @@ function tdGetImageData(img, ob, i, reflection) {
 		function () {
 			tdTexture[ob][i] = null;
 			console.warn('DUNGEON: Texture not found: ' + img);
+			tdGetImageData('/images/empty.png', ob, i, false);
 			loadingCountError++;
 		}
 	);
@@ -647,8 +658,9 @@ function tdCreateMaterial(ob, i) {
 						let themeColor = (themeColorList[themeColorRand] === '') ? '' : ',ic:specific,isc:' + themeColorList[themeColorRand];
 						themeColor = image.extra ? ',' + image.extra : themeColor;
 						const themePath = themeOverride.replace(/^(?:(.*?\+.*?\+.*?)\+.*?)$|^([^\+]*?)$/g, '$1$2') || 'any';
-						const tdPath = '/' + themePath + '/' + image.id.replace(/^\+/, '') + '/' + (themeColorList[themeColorRand] || 'any') + '/' + i + '.png';
-						const uri = '/search?q=' + themeOverride + image.id + '&tbs=ift:png,isz:ex,iszw:512,iszh:512' + themeColor + '&tbm=isch&tdPath=' + tdPath;
+						const imageId = image.id.replace(/^\+/, '') || 'any';
+						const tdPath = '/' + themePath + '/' + imageId + '/' + (themeColorList[themeColorRand] || 'any') + '/' + i + '.png';
+						const uri = '/search?q=' + themeOverride + image.id + '+-minecraft&tbs=ift:png,isz:ex,iszw:512,iszh:512' + themeColor + '&tbm=isch&tdPath=' + tdPath;
 						tdGetImageData(uri, ob, i, reflection);
 						$('body #theme').val(themeOverride);
 					}, 1);
@@ -1105,7 +1117,7 @@ function tdCreateObject(f, x, y) {
 			case 'teleport': x1 = 0.002, y1 = 0.002, z1 = 0.002, x2 = 0.996, y2 = 0.996, z2 = 0.996; type = 'box'; mat = 'teleport'; rnd = 100; seed = 515.78; break;
 			case 'teleport-up': x1 = 0.002, y1 = 0.002, z1 = 0.002, x2 = 0.996, y2 = 0.996, z2 = 0.996; type = 'box'; mat = 'teleport-up'; rnd = 100; seed = 515.78; break;
 			case 'pit': x1 = 0, y1 = 0, z1 = -1, x2 = 1, y2 = 1, z2 = 1; type = 'pit'; mat = 'floor'; rnd = 100; seed = 51.33; break;
-			case 'pit-ceil': x1 = 0, y1 = 0, z1 = 1, x2 = 1, y2 = 1, z2 = 1; type = 'pit'; mat = 'floor'; rnd = 100; seed = 51.33; break;
+			case 'pit-ceil': x1 = 0, y1 = 0, z1 = 1, x2 = 1, y2 = 1, z2 = 1; type = 'pit'; mat = 'ceil'; rnd = 100; seed = 51.33; break;
 			case 'stairs-up': x1 = 0, y1 = 0, z1 = 0, x2 = 1, y2 = 1, z2 = 1; type = 'stairs-up'; mat = 'wall'; rnd = 100; break;
 			case 'stairs-down': x1 = 0, y1 = 0, z1 = -1, x2 = 1, y2 = 1, z2 = 1; type = 'stairs-down'; mat = 'wall'; rnd = 100; break;
 			case 'wall-switch': x1 = 0.4, y1 = 1.002, z1 = 0.6, x2 = 0.2, y2 = 1, z2 = 0.2; type = 'wall-deco'; mat = 'wall-switch'; seed = 123.43; break;
@@ -1543,14 +1555,14 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 						ms1 = tdDrawObject(type, ms, f, x, y, x1, y1, z1, x2, y2, z2, 0, 'floor', mat, rnd, 51.33);
 					}
 					if (hasSquare(x, y, 'pit-ceil') === -1) {
-						ms1 = tdDrawObject(type, ms, f, x, y, x1, y1, z1, x2, y2, z2, 0, 'ceil', mat, rnd, 51.33);
+						ms1 = tdDrawObject(type, ms, f, x, y, x1, y1, z1, x2, y2, z2, 0, 'ceil', 'ceil', rnd, 51.33);
 					}
 				} else {
 					if (hasSquare(x, y, 'pit') === -1) {
 						ms1 = tdDrawObject(type, ms, f, x, y, x1, y1, z1, x2, y2, z2, 0, 'floor', mat, rnd, 51.33);
 					}
 					if (getSquareFeature(x, y, 'double') !== 'ceil' && getSquareFeature(x, y, 'double') !== 'none' && hasSquare(x, y, 'pit-ceil') === -1) {
-						ms1 = tdDrawObject(type, ms, f, x, y, x1, y1, z1 - 0.001, x2, y2, z2, 0, 'ceil', mat, rnd, 51.33);
+						ms1 = tdDrawObject(type, ms, f, x, y, x1, y1, z1 - 0.001, x2, y2, z2, 0, 'ceil', 'ceil', rnd, 51.33);
 					}
 				}
 				if (r === 0) {
@@ -1595,7 +1607,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				ms1 = tdDrawObject(type, ms, f - 1, x, y, x1, y1 + 2, z1 - 2, x2, y2, z2, 0, 'stairs', mat, rnd, 129.22);
 				//ms1 = tdDrawObject(type, ms, f + 1, x, y, x1, y1 + 3, z1 - 3, x2, y2, z2, 0, 'stairs', mat, rnd, 129.22);
 				if (getSquareFeature(x, y, 'double') === 'wall') {
-					ms1 = tdDrawObject('floor', ms, f, x, y, x1, y1, z1 + 1, x2, y2, z2, 0, 'ceil', 'floor', rnd, 51.33);
+					ms1 = tdDrawObject('floor', ms, f, x, y, x1, y1, z1 + 1, x2, y2, z2, 0, 'ceil', 'ceil', rnd, 51.33);
 				}
 				ms1 = tdDrawObject('box4', ms, f, x + dir[d1].x, y + dir[d1].y, x1 - 1, y1, z1, x2, y2, z2, 0, 'box4', 'wall', rnd, 129.22);
 				ms1 = tdDrawObject('box4', ms, f, x + dir[d3].x, y + dir[d3].y, x1 + 1, y1, z1, x2, y2, z2, 0, 'box4', 'wall', rnd, 129.22);
