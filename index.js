@@ -142,7 +142,7 @@ function pngProgress(text) {
 		pngPipeline--;
 	}
 	//console.log(pngPipeline, pngPipelineError);
-	process.stdout.write('PNG ' + text + ' ' + '.'.repeat(pngPipeline) + '\x1b[31m.\x1b[0m'.repeat(pngPipelineError) + ' \r');
+	process.stdout.write('IMAGE ' + text + ' ' + '.'.repeat(pngPipeline) + '\x1b[31m.\x1b[0m'.repeat(pngPipelineError) + ' \r');
 }
 
 function parseRequest(req, response) {
@@ -170,10 +170,7 @@ function parseRequest(req, response) {
 			if (notFound) {
 				mkdirp.sync(pth.dir);
 			}
-			response.writeHead(200, {
-				'Access-Control-Allow-Origin': '*',
-				'Content-Type': 'image/png'
-			});
+			response.header('Access-Control-Allow-Origin', '*');
 			fs.access(pth.dir + '/' + pth.file, fs.constants.F_OK, (notFound) => {
 				if (notFound) {
 					if (imageList['i' + parseInt(pth.file)]) {
@@ -181,7 +178,8 @@ function parseRequest(req, response) {
 							fs.readFile(pth.dir + '/' + pth.file, function (er, dataPng) {
 								updateImageList(pth, imageList); // NOT existing image + Found in image list
 								pngProgress('saved');
-								response.end(dataPng);
+								response.header('image-reference-url', imageList['i' + pth.file]);
+								response.status(200).end(dataPng);
 							});
 						});
 					} else {
@@ -205,24 +203,25 @@ function parseRequest(req, response) {
 									fs.readFile(pth.dir + '/' + pth.file, function (er, dataPng) {
 										pngProgress('saved');
 										updateImageList(pth, imageList); // NOT existing image + NOT found in image list
-										response.end(dataPng);
+										response.header('image-reference-url', imageList['i' + pth.file]);
+										response.status(200).end(dataPng);
 									});
 								});
 							});
 							res.on('error', function (err) {
 								pngProgress('error');
-								response.end();
+								response.status(404).end();
 							});
 						}).on('error', function (err) {
 							pngProgress('error');
-							response.writeHead(404);
-							response.end();
+							response.status(404).end();
 						}).end();
 					}
 				} else {
 					fs.readFile(pth.dir + '/' + pth.file, function (er, dataPng) { // Existing image + Found in image list
 						pngProgress('saved');
-						response.end(dataPng);
+						response.header('image-reference-url', imageList['i' + pth.file]);
+						response.status(200).end(dataPng);
 					});
 				}
 			});
@@ -232,16 +231,15 @@ function parseRequest(req, response) {
 			'Access-Control-Allow-Origin': '*',
 			'Content-Type': mimetype
 		});
-		if (fsPathName.match(/\.jpg$/) && !fs.existsSync(baseDirectory + fsPathName)) {
-			fsPathName = fsPathName.replace(/\.jpg$/, '.png');
-		}
+		//if (fsPathName.match(/\.jpg$/) && !fs.existsSync(baseDirectory + fsPathName)) {
+		//fsPathName = fsPathName.replace(/\.jpg$/, '.png');
+		//}
 		fileStream = fs.createReadStream(baseDirectory + fsPathName);
 		(function (fileStream, response) {
 			fileStream.on('open', function () {
 				fileStream.pipe(response);
 			});
 			fileStream.on('error', function (err) {
-				response.writeHead(404);
 				response.end();
 			});
 		})(fileStream, response);

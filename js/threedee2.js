@@ -72,7 +72,7 @@ var imageId = {
 		'max': 100000 //21
 	},
 	'floor': {
-		'id': '+texture+floor+OR+ceiling+OR+ground+OR+road',
+		'id': '+texture+floor+OR+ceiling+OR+ground',
 		'max': 100000 //33
 	},
 	'ceiling': {
@@ -659,8 +659,8 @@ function tdCreateMaterial(ob, i) {
 						themeColor = image.extra ? ',' + image.extra : themeColor;
 						const themePath = themeOverride.replace(/^(?:(.*?\+.*?\+.*?)\+.*?)$|^([^\+]*?)$/g, '$1$2') || 'any';
 						const imageId = image.id.replace(/^\+/, '') || 'any';
-						const tdPath = '/' + themePath + '/' + imageId + '/' + (themeColorList[themeColorRand] || 'any') + '/' + i + '.png';
-						const uri = '/search?q=' + themeOverride + image.id + '+-minecraft&tbs=ift:png,isz:ex,iszw:512,iszh:512' + themeColor + '&tbm=isch&tdPath=' + tdPath;
+						const tdPath = '/' + themePath + '/' + imageId + '/' + (themeColorList[themeColorRand] || 'any') + '/' + i; //+ '.png'
+						const uri = '/search?q=' + themeOverride + image.id + '+-minecraft&tbs=isz:ex,iszw:512,iszh:512' + themeColor + '&tbm=isch&tdPath=' + tdPath; //ift:png,
 						tdGetImageData(uri, ob, i, reflection);
 						$('body #theme').val(themeOverride);
 					}, 1);
