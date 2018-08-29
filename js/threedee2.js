@@ -91,12 +91,12 @@ var imageId = {
 	},
 	'wallDeco': {
 		'id': '+decoration+wall', //+wall+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+grass+OR+moss+OR+cracks+OR+painting+OR+banner
-		'extra': 'ic:trans',
+		'extra': 'ic:trans,itp:photo',
 		'max': 100000 //23
 	},
 	'floorDeco': {
 		'id': '+decoration+floor+OR+ceiling', //+floor+OR+ground+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+cracks+OR+grate
-		'extra': 'ic:trans',
+		'extra': 'ic:trans,itp:photo',
 		'max': 100000 //10
 	},
 	'obstacle': {
@@ -547,23 +547,23 @@ function tdCreateMaterial(ob, i) {
 	var img = image.id + '/' + i;
 	if (typeof tdMaterial[ob].color !== 'undefined') {
 		if (tdMaterial[ob].color === 'random') {
-			var h = rand(Math.floor(origin.f / 10), 0, 0, 97.13, 100) * 0.01;
+			var h = rand(Math.floor(origin.f / floorSize), 0, 0, 97.13, viewSize) * 0.01;
 			var s = 1.0;
-			var l = 0.5 - rand(Math.floor(origin.f / 10), 0, 0, 531.09, 25) * 0.01;
+			var l = 0.5 - rand(Math.floor(origin.f / floorSize), 0, 0, 531.09, 25) * 0.01;
 			color = new THREE.Color().setHSL(h, s, l);
 		} else {
 			color = new THREE.Color(tdMaterial[ob].color);
 		}
 	} else if (tdMaterial[ob].lightColor === 'random') {
-		var h = rand(Math.floor(origin.f / 10), 0, 0, 112.11, 100) * 0.01;
+		var h = rand(Math.floor(origin.f / floorSize), 0, 0, 112.11, viewSize) * 0.01;
 		var s = 1.0;
 		var l = 0.5 - rand(Math.floor(origin.f / 10), 0, 0, 665.57, 25) * 0.01;
 		color = new THREE.Color().setHSL(h, s, l);
 	}
 	var emissiveIntensity = 1;
-	var emissive = (rand(Math.floor(origin.f / 10), 0, 0, 112.10, 8));
-	emissive += ',' + (rand(Math.floor(origin.f / 10), 0, 0, 843.59, 8));
-	emissive += ',' + (rand(Math.floor(origin.f / 10), 0, 0, 650.22, 8));
+	var emissive = (rand(Math.floor(origin.f / floorSize), 0, 0, 112.10, 8));
+	emissive += ',' + (rand(Math.floor(origin.f / floorSize), 0, 0, 843.59, 8));
+	emissive += ',' + (rand(Math.floor(origin.f / floorSize), 0, 0, 650.22, 8));
 	emissive = new THREE.Color('rgb(' + emissive + ')');
 	if (typeof tdMaterial[ob].emissive !== 'undefined') {
 		emissive = new THREE.Color(tdMaterial[ob].emissive);
@@ -651,9 +651,8 @@ function tdCreateMaterial(ob, i) {
 			if (image.id.indexOf('+') === 0) {
 				(function (ob, i) {
 					setTimeout(function () { //GOOGLE STARTS HERE!!!
-						//const themeRand = rand(Math.floor(origin.f / 10), 0, 0, 712.83, 1000);
-						const themeRand = rand(Math.floor(origin.f / 10), 0, 0, 712.83, themeList.length);
-						const themeColorRand = rand(Math.floor(origin.f / 10), 0, 0, 299.11, themeColorList.length);
+						const themeRand = rand(Math.floor(origin.f / floorSize), 0, 0, 712.83, themeList.length);
+						const themeColorRand = rand(Math.floor(origin.f / floorSize), 0, 0, 299.11, themeColorList.length);
 						themeOverride = themeOverride || themeList[themeRand];
 						let themeColor = (themeColorList[themeColorRand] === '') ? '' : ',ic:specific,isc:' + themeColorList[themeColorRand];
 						themeColor = image.extra ? ',' + image.extra : themeColor;
@@ -1029,15 +1028,15 @@ function tdDrawAll(force, callback) {
 		origin.xt = origin.x;
 		origin.yt = origin.y;
 
-		var emissive = (rand(Math.floor(origin.f / 10), 0, 0, 112.10, 8) * 4 + 16);
-		emissive += ',' + (rand(Math.floor(origin.f / 10), 0, 0, 843.59, 8) * 4 + 16);
-		emissive += ',' + (rand(Math.floor(origin.f / 10), 0, 0, 650.22, 8) * 4 + 16);
+		var emissive = (rand(Math.floor(origin.f / floorSize), 0, 0, 112.10, 8) * 4 + 16);
+		emissive += ',' + (rand(Math.floor(origin.f / floorSize), 0, 0, 843.59, 8) * 4 + 16);
+		emissive += ',' + (rand(Math.floor(origin.f / floorSize), 0, 0, 650.22, 8) * 4 + 16);
 		emissive = 'rgb(' + emissive + ')';
 		renderer.setClearColor(emissive, 1);
 		scene.fog.color = new THREE.Color(emissive);
 		ambientLight.color = new THREE.Color(emissive);
 		tdUpdateCameraLight();
-		//tdGenerateTexture(Math.floor(origin.f / 10));
+		//tdGenerateTexture(Math.floor(origin.f / floorSize));
 	}
 	var i = 0;
 	for (var x = 0; x < viewSize; x++) {
@@ -1104,28 +1103,28 @@ function tdCreateObject(f, x, y) {
 		var seed = 0;
 		var rnd = 1;
 		switch (ob[o].replace(/[0-9]/g, '')) {
-			case 'wall': x1 = 0, y1 = 0, z1 = 0, x2 = 1, y2 = 1, z2 = 1; type = 'wall'; mat = 'wall'; rnd = 100; seed = 129.22; break;
-			case 'wall-wood': x1 = 0, y1 = 0.99, z1 = 0, x2 = 1, y2 = 0.02, z2 = 1; type = 'wall-wood'; mat = 'wall-wood'; rnd = 100; seed = 444.01; break;
-			case 'door-wood': x1 = 0, y1 = 0.99, z1 = 0, x2 = 1, y2 = 0.02, z2 = 1; type = 'door-wood'; mat = 'wall-wood-x05'; rnd = 100; seed = 444.01; break;
-			case 'door-wood-open': x1 = 0, y1 = 0.99, z1 = 0, x2 = 1, y2 = 0.02, z2 = 1; type = 'door-wood-open'; mat = 'wall-wood-x05'; rnd = 100; seed = 444.01; break;
-			case 'floor': x1 = 0, y1 = 0, z1 = 0, x2 = 1, y2 = 1, z2 = 1; type = 'floor-ceil'; mat = 'floor'; rnd = 100; break;
-			case 'wall-secret': x1 = 0, y1 = 0, z1 = 0, x2 = 1, y2 = 1, z2 = 1; type = 'wall-secret'; mat = 'wall-secret'; rnd = 100; break;
-			case 'pillar': x1 = 0.35, y1 = 0.35, z1 = 0, x2 = 0.3, y2 = 0.3, z2 = 1; type = 'pillar'; mat = 'wall'; rnd = 100; seed = 129.22; break;
-			case 'obstacle': x1 = 0, y1 = 0, z1 = 0, x2 = 1, y2 = 1, z2 = 1; type = 'obstacle'; mat = 'obstacle'; rnd = 100; seed = 129.22; break;
-			case 'door': x1 = 0, y1 = 0.45, z1 = 0, x2 = 1, y2 = 0.1, z2 = 1; type = 'door'; mat = 'door'; rnd = 100; break;
-			case 'door-open': x1 = 0, y1 = 0.45, z1 = 0, x2 = 1, y2 = 0.1, z2 = 1; type = 'door-open'; mat = 'door'; rnd = 100; break;
-			case 'teleport': x1 = 0.002, y1 = 0.002, z1 = 0.002, x2 = 0.996, y2 = 0.996, z2 = 0.996; type = 'box'; mat = 'teleport'; rnd = 100; seed = 515.78; break;
-			case 'teleport-up': x1 = 0.002, y1 = 0.002, z1 = 0.002, x2 = 0.996, y2 = 0.996, z2 = 0.996; type = 'box'; mat = 'teleport-up'; rnd = 100; seed = 515.78; break;
-			case 'pit': x1 = 0, y1 = 0, z1 = -1, x2 = 1, y2 = 1, z2 = 1; type = 'pit'; mat = 'floor'; rnd = 100; seed = 51.33; break;
-			case 'pit-ceil': x1 = 0, y1 = 0, z1 = 1, x2 = 1, y2 = 1, z2 = 1; type = 'pit'; mat = 'ceil'; rnd = 100; seed = 51.33; break;
-			case 'stairs-up': x1 = 0, y1 = 0, z1 = 0, x2 = 1, y2 = 1, z2 = 1; type = 'stairs-up'; mat = 'wall'; rnd = 100; break;
-			case 'stairs-down': x1 = 0, y1 = 0, z1 = -1, x2 = 1, y2 = 1, z2 = 1; type = 'stairs-down'; mat = 'wall'; rnd = 100; break;
+			case 'wall': x1 = 0, y1 = 0, z1 = 0, x2 = 1, y2 = 1, z2 = 1; type = 'wall'; mat = 'wall'; rnd = viewSize; seed = 129.22; break;
+			case 'wall-wood': x1 = 0, y1 = 0.99, z1 = 0, x2 = 1, y2 = 0.02, z2 = 1; type = 'wall-wood'; mat = 'wall-wood'; rnd = viewSize; seed = 444.01; break;
+			case 'door-wood': x1 = 0, y1 = 0.99, z1 = 0, x2 = 1, y2 = 0.02, z2 = 1; type = 'door-wood'; mat = 'wall-wood-x05'; rnd = viewSize; seed = 444.01; break;
+			case 'door-wood-open': x1 = 0, y1 = 0.99, z1 = 0, x2 = 1, y2 = 0.02, z2 = 1; type = 'door-wood-open'; mat = 'wall-wood-x05'; rnd = viewSize; seed = 444.01; break;
+			case 'floor': x1 = 0, y1 = 0, z1 = 0, x2 = 1, y2 = 1, z2 = 1; type = 'floor-ceil'; mat = 'floor'; rnd = viewSize; break;
+			case 'wall-secret': x1 = 0, y1 = 0, z1 = 0, x2 = 1, y2 = 1, z2 = 1; type = 'wall-secret'; mat = 'wall-secret'; rnd = viewSize; break;
+			case 'pillar': x1 = 0.35, y1 = 0.35, z1 = 0, x2 = 0.3, y2 = 0.3, z2 = 1; type = 'pillar'; mat = 'wall'; rnd = viewSize; seed = 129.22; break;
+			case 'obstacle': x1 = 0, y1 = 0, z1 = 0, x2 = 1, y2 = 1, z2 = 1; type = 'obstacle'; mat = 'obstacle'; rnd = viewSize; seed = 129.22; break;
+			case 'door': x1 = 0, y1 = 0.45, z1 = 0, x2 = 1, y2 = 0.1, z2 = 1; type = 'door'; mat = 'door'; rnd = viewSize; break;
+			case 'door-open': x1 = 0, y1 = 0.45, z1 = 0, x2 = 1, y2 = 0.1, z2 = 1; type = 'door-open'; mat = 'door'; rnd = viewSize; break;
+			case 'teleport': x1 = 0.002, y1 = 0.002, z1 = 0.002, x2 = 0.996, y2 = 0.996, z2 = 0.996; type = 'box'; mat = 'teleport'; rnd = viewSize; seed = 515.78; break;
+			case 'teleport-up': x1 = 0.002, y1 = 0.002, z1 = 0.002, x2 = 0.996, y2 = 0.996, z2 = 0.996; type = 'box'; mat = 'teleport-up'; rnd = viewSize; seed = 515.78; break;
+			case 'pit': x1 = 0, y1 = 0, z1 = -1, x2 = 1, y2 = 1, z2 = 1; type = 'pit'; mat = 'floor'; rnd = viewSize; seed = 51.33; break;
+			case 'pit-ceil': x1 = 0, y1 = 0, z1 = 1, x2 = 1, y2 = 1, z2 = 1; type = 'pit'; mat = 'ceil'; rnd = viewSize; seed = 51.33; break;
+			case 'stairs-up': x1 = 0, y1 = 0, z1 = 0, x2 = 1, y2 = 1, z2 = 1; type = 'stairs-up'; mat = 'wall'; rnd = viewSize; break;
+			case 'stairs-down': x1 = 0, y1 = 0, z1 = -1, x2 = 1, y2 = 1, z2 = 1; type = 'stairs-down'; mat = 'wall'; rnd = viewSize; break;
 			case 'wall-switch': x1 = 0.4, y1 = 1.002, z1 = 0.6, x2 = 0.2, y2 = 1, z2 = 0.2; type = 'wall-deco'; mat = 'wall-switch'; seed = 123.43; break;
 			case 'wall-switch-off': x1 = 0.4, y1 = 1.002, z1 = 0.6, x2 = 0.2, y2 = 1, z2 = 0.2; type = 'wall-deco'; mat = 'wall-switch-off'; seed = 123.43; break;
 			case 'wall-deco': x1 = 0, y1 = 1.003, z1 = 0, x2 = 1, y2 = 1, z2 = 1; type = 'wall-deco'; mat = 'wall-deco'; seed = 860.97; break;
 			case 'wall-deco-high': x1 = 0, y1 = 1.003, z1 = 1, x2 = 1, y2 = 1, z2 = 1; type = 'wall-deco'; mat = 'wall-deco'; seed = 443.13; break;
 			case 'floor-deco': x1 = 0, y1 = 0, z1 = 0.003, x2 = 1, y2 = 1, z2 = 1; type = 'floor-deco'; mat = 'floor-deco'; break;
-			case 'ceil-light': x1 = 0.4, y1 = 0.4, z1 = 1.5, x2 = 0.2, y2 = 0.2, z2 = 0.5; type = 'ceil-light'; mat = 'ceil-light'; rnd = 100; seed = 129.22; break;
+			case 'ceil-light': x1 = 0.4, y1 = 0.4, z1 = 1.5, x2 = 0.2, y2 = 0.2, z2 = 0.5; type = 'ceil-light'; mat = 'ceil-light'; rnd = viewSize; seed = 129.22; break;
 			case 'wall-light': x1 = 0.45, y1 = 1.002, z1 = 0.7, x2 = 0.1, y2 = 0.15, z2 = 0.2; type = 'wall-light'; mat = 'wall-light'; break;
 			case 'wall-light-high': x1 = 0.45, y1 = 1.002, z1 = 1.7, x2 = 0.1, y2 = 0.15, z2 = 0.2; type = 'wall-light-high'; mat = 'wall-light'; break;
 			case 'window-high': x1 = 0, y1 = 0.49, z1 = 1, x2 = 1, y2 = 0.02, z2 = 1; type = 'window'; mat = 'window'; seed = 812.93; break;
@@ -1141,18 +1140,18 @@ function tdCreateObject(f, x, y) {
 		}
 		if (o === 0) {
 			if (getSquareFeature(x, y, 'double') === 'ceil') {
-				ms1 = tdDrawObject('floor-ceil-double', msg, f, x, y, 0, 0, 1, 1, 1, 1, 0, 'floor-ceil', 'floor', 100);
+				ms1 = tdDrawObject('floor-ceil-double', msg, f, x, y, 0, 0, 1, 1, 1, 1, 0, 'floor-ceil', 'floor', viewSize);
 				if (ms1 !== null) {
 					tdRotateInWorld('y', ms1, (-(d + 2) * 90) * Math.PI / 180);
 				}
 			} else if (getSquareFeature(x, y, 'double') === 'wall') {
-				ms2 = tdDrawObject('wall', msg, f, x, y, 0, 0, 1, 1, 1, 1, 0, 'wall', 'wall', 100, 129.22);
+				ms2 = tdDrawObject('wall', msg, f, x, y, 0, 0, 1, 1, 1, 1, 0, 'wall', 'wall', viewSize, 129.22);
 				if (ms2 !== null) {
 					tdRotateInWorld('y', ms2, (-(d + 2) * 90) * Math.PI / 180);
 				}
 			}
 			if (getSquareFeature(x, y, 'triple') === 'wall') {
-				ms3 = tdDrawObject('wall', msg, f + 1, x, y, 0, 0, 2, 1, 1, 1, 0, 'wall', 'wall', 100, 129.22);
+				ms3 = tdDrawObject('wall', msg, f + 1, x, y, 0, 0, 2, 1, 1, 1, 0, 'wall', 'wall', viewSize, 129.22);
 				if (ms3 !== null) {
 					tdRotateInWorld('y', ms3, (-(d + 2) * 90) * Math.PI / 180);
 				}
@@ -1174,7 +1173,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 	if (metatype !== '') {
 		switch (metatype) {
 			case 'box':
-				i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
+				i = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				//i = 38;
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
@@ -1194,7 +1193,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'box4':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
+				var i = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				//i = 38;
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
@@ -1215,7 +1214,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'floor':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
+				var i = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				//i = 32;
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
@@ -1233,7 +1232,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'ceil':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
+				var i = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				//i = 32;
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
@@ -1251,7 +1250,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'wall-deco':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
+				var i = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
 					if (typeof tdGeometry[geotype] === 'undefined' || tdGeometry[geotype] === null) {
@@ -1272,7 +1271,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'ramp-reversed':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
+				var i = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
 					if (typeof tdGeometry[geotype] === 'undefined' || tdGeometry[geotype] === null) {
@@ -1287,7 +1286,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'cylinder':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
+				var i = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
 					if (typeof tdGeometry[geotype] === 'undefined' || tdGeometry[geotype] === null) {
@@ -1301,7 +1300,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'cylinder-rx':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
+				var i = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
 					if (typeof tdGeometry[geotype] === 'undefined' || tdGeometry[geotype] === null) {
@@ -1316,7 +1315,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'cylinder-rz':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
+				var i = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				m = tdCreateMaterial(mat, i);
 				if (m !== null) {
 					if (typeof tdGeometry[geotype] === 'undefined' || tdGeometry[geotype] === null) {
@@ -1382,7 +1381,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				ms = new THREE.Object3D();
 				ms1 = tdDrawObject(type, ms, f, x, y, x1, y1, z1, x2, y2, z2, 0, 'box4', mat, rnd, 129.22);
 				tdHideWallFaces(ms1, x, y);
-				var r = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), 391.87, 12);
+				var r = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), 391.87, 12);
 				if (r === 0) {
 					if ((x + y) % 2 === 0) {
 						ms1 = tdDrawObject(type, ms, f, x, y, x1 - 0.05, y1 - 0.05, z1 + 0.001, 0.101, 0.101, z2 - 0.002, 0, 'cylinder', 'wall-wood-x05', rnd, 444.01);
@@ -1419,7 +1418,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 			case 'wall-wood':
 				ms = new THREE.Object3D();
 				ms1 = tdDrawObject(type, ms, f, x, y, x1, y1, z1, x2, y2, z2, 0, 'box4', mat, rnd, seed);
-				var r = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), 391.87, 10);
+				var r = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), 391.87, 10);
 				if (r === 0) {
 					if ((x + y) % 2 === 0) {
 						ms1 = tdDrawObject(type, ms, f, x, y, -0.05, 0.95, z1 + 0.001, 0.1, 0.1, z2 - 0.002, 0, 'cylinder', 'wall-wood-x05', rnd, seed);
@@ -1437,7 +1436,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				ms1 = tdDrawObject(type, ms, f, x, y, x1 + 0.75, y1, z1, 0.25, y2, z2, 0, 'box4', 'door-wood-right', rnd, seed);
 				ms1 = tdDrawObject(type, ms, f, x, y, x1 + 0.25, y1, 0.75, 0.5, y2, 0.25, 0, 'box', 'door-wood-top', rnd, seed);
 				ms1 = tdDrawObject(type, ms, f, x, y, x1 + 0.26, y1 + 0.005, z1, 0.48, y2 - 0.01, 0.74, 0, 'box4', 'door-wood', rnd, seed);
-				var r = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), 391.87, 10);
+				var r = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), 391.87, 10);
 				if (r === 0) {
 					if ((x + y) % 2 === 0) {
 						ms1 = tdDrawObject(type, ms, f, x, y, -0.05, 0.95, z1 + 0.001, 0.1, 0.1, z2 - 0.002, 0, 'cylinder', 'wall-wood-x05', rnd, seed);
@@ -1454,7 +1453,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				ms1 = tdDrawObject(type, ms, f, x, y, x1, y1, z1, 0.25, y2, z2, 0, 'box4', 'door-wood-left', rnd, seed);
 				ms1 = tdDrawObject(type, ms, f, x, y, x1 + 0.75, y1, z1, 0.25, y2, z2, 0, 'box4', 'door-wood-right', rnd, seed);
 				ms1 = tdDrawObject(type, ms, f, x, y, x1 + 0.25, y1, 0.75, 0.5, y2, 0.25, 0, 'box', 'door-wood-top', rnd, seed);
-				var r = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), 391.87, 10);
+				var r = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), 391.87, 10);
 				if (r === 0) {
 					ms1 = tdDrawObject(type, ms, f, x, y, -0.05, 0.95, z1 + 0.001, 0.1, 0.1, z2 - 0.002, 0, 'cylinder', 'wall-wood-x05', rnd, seed);
 					ms1 = tdDrawObject(type, ms, f, x, y, 0.95, 0.95, z1 + 0.001, 0.1, 0.1, z2 - 0.002, 0, 'cylinder', 'wall-wood-x05', rnd, seed);
@@ -1471,7 +1470,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'pit':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
+				var i = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				ms = new THREE.Object3D();
 				var z3 = 0;
 				if (z1 === 1) {
@@ -1485,7 +1484,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'stairs':
-				var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
+				var i = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				ms = new THREE.Object3D();
 				//tdLoadObjectOBJ(metatype, ms, x1, y1, z1, x2, y2, z2, 0, mat, i);
 				for (var s = 0; s < 10; s++) {
@@ -1495,7 +1494,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 
 			case 'pillar2':
 				ms = new THREE.Object3D();
-				var r = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), 529.52, 5);
+				var r = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), 529.52, 5);
 				if (r === 0) {
 					ms1 = tdDrawObject('cylinder', ms, f, x, y, x1, y1, z1, x2, y2, z2, 0, 'cylinder', mat, rnd, 129.22);
 					ms1 = tdDrawObject('cylinder', ms, f, x, y, x1 - 0.1, y1 - 0.1, z1, x2 + 0.2, y2 + 0.2, 0.2, 0, 'cylinder', 'wall-x20-y02', rnd, 129.22);
@@ -1508,7 +1507,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 					ms1 = tdDrawObject('box', ms, f, x, y, x1 - 0.1, y1 - 0.1, z1 + 0.8, x2 + 0.2, y2 + 0.2, 0.2, 0, 'box', 'wall-x05-y02', rnd, 129.22);
 				} else if (r === 3) {
 					ms1 = tdDrawObject('box4', ms, f, x, y, x1, y1, z1, x2, y2, z2, 0, 'box4', 'wall-x025', rnd, 129.22);
-					//var i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
+					//var i = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 					//ms = new THREE.Object3D();
 					//tdLoadObjectOBJ('pillar', ms, x1, y1, z1, x2, y2, z2, 0, mat, i);
 				} else {
@@ -1549,7 +1548,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 
 			case 'floor-ceil':
 				ms = new THREE.Object3D();
-				var r = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), 128.13, 12);
+				var r = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), 128.13, 12);
 				if (type === 'floor-ceil-double') {
 					if (hasSquare(x, y, 'wall') > -1) {
 						ms1 = tdDrawObject(type, ms, f, x, y, x1, y1, z1, x2, y2, z2, 0, 'floor', mat, rnd, 51.33);
@@ -1656,7 +1655,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 				break;
 
 			case 'ceil-light':
-				i = rand(Math.floor(f / Math.ceil(rnd / 10)), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
+				i = rand(Math.floor(f / floorSize), Math.floor(x / rnd), Math.floor(y / rnd), seed, tdMaterial[mat].image.max);
 				ms = new THREE.Object3D();
 				ms.position.x = (x1 + (x2 / 2)) * tdSquareSize.x - tdSquareSize.x * 0.5;
 				ms.position.y = (z1 + (z2 / 2)) * tdSquareSize.y;
@@ -1697,12 +1696,12 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 						dist = tdMaterial[mat].lightDistance;
 					}
 					if (tdMaterial[mat].lightColor === 'random') {
-						var h = rand(Math.floor(f / 10), 0, 0, 112.11, 100) * 0.01;
+						var h = rand(Math.floor(f / 10), 0, 0, 112.11, viewSize) * 0.01;
 						var s = 1.0;
 						var l = 0.5 - rand(Math.floor(f / 10), 0, 0, 665.57, 25) * 0.01;
 						col = new THREE.Color().setHSL(h, s, l);
 					} else if (tdMaterial[mat].lightColor === 'random2') {
-						var h = rand(f, x, y, 441.97, 100) * 0.01;
+						var h = rand(f, x, y, 441.97, viewSize) * 0.01;
 						var s = 1.0;
 						var l = 1.0 - rand(f, x, y, 423.12, 25) * 0.01;
 						col = new THREE.Color().setHSL(h, s, l);
@@ -1751,6 +1750,7 @@ function tdDrawObject(type, msg, f, x, y, x1, y1, z1, x2, y2, z2, d, metatype, m
 					}
 				}
 			}
+			//if (ms.material) ms.material.opacity = 0.1;
 			ms.matrixAutoUpdate = false;
 			ms.receiveShadow = true;
 			ms.updateMatrix();
@@ -1768,9 +1768,9 @@ function tdBlurGeometry(g) {
 		var x = g.vertices[v].x;
 		var y = g.vertices[v].y;
 		var z = g.vertices[v].z;
-		g.vertices[v].x += rand(origin.f, g.id, 0, 212.88 * v, 100) * 0.0004 - 0.02;
-		g.vertices[v].y += rand(origin.f, g.id, 0, 763.99 * v, 100) * 0.0004 - 0.02;
-		g.vertices[v].z += rand(origin.f, g.id, 0, 30.71 * v, 100) * 0.0002;
+		g.vertices[v].x += rand(origin.f, g.id, 0, 212.88 * v, viewSize) * 0.0004 - 0.02;
+		g.vertices[v].y += rand(origin.f, g.id, 0, 763.99 * v, viewSize) * 0.0004 - 0.02;
+		g.vertices[v].z += rand(origin.f, g.id, 0, 30.71 * v, viewSize) * 0.0002;
 	}
 	g.verticesNeedUpdate = true;
 }
@@ -2127,7 +2127,7 @@ function tdUpdateCamera(fast = false) {
 		tdUpdateCameraLight();
 		var coo = 'F: ' + origin.f + ', X: ' + origin.x + ', Y: ' + origin.y + ', D: ' + origin.d;
 		$('body input#coordinates').val(coo);
-		setCookie('playercoordinates', coo);
+		setCoords(origin);
 	}
 }
 

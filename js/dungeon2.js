@@ -6,21 +6,19 @@ var debug = false;
 var stereo = false;
 var gameLoaded = false;
 var dir = [{ x: 0, y: -1 }, { x: 1, y: 0 }, { x: 0, y: 1 }, { x: -1, y: 0 }];
+
+var imagePathQuality = 'high/'; //image folder to load images from
+var squareSize = 4; //map square size 16
+var mapSize = 50; //map size 30
+var floorSize = 6; //floor size 10
+var viewSize = 50; //visible size of map 12
+var tdViewSize = 14; //visible size of 3D 14
 if (isMobile) {
-	var imagePathQuality = 'high/';
-	var squareSize = 4;
-	var mapSize = 120;
-	var viewSize = 100;
-	var tdViewSize = 14;
 	var terrainLightMax = 0;
 } else {
-	var imagePathQuality = 'high/'; //image folder to load images from
-	var squareSize = 4; //map square size 16
-	var mapSize = 120; //map size 30
-	var viewSize = 100; //visible size of map 12
-	var tdViewSize = 14; //visible size of 3D 14
 	var terrainLightMax = 1; //maximum number of terrain lights 1
 }
+
 var tdSquareSize = { x: 1.25, y: 1 };
 var tdPlayerHeight = 0.6;
 var tdBackStep;
@@ -264,20 +262,27 @@ function parseCoordinates(str) {
 
 function initPlayer(force = false) {
 	var str = '';
+	let coord = {};
 	if (!force) {
-		str = getCookie('playercoordinates');
+		coord = getCoords();
 	}
-	if (str === '') {
+	console.log(force, JSON.stringify(coord));
+	if (coord && coord.f) {
+		origin = {
+			f: coord.f,
+			x: coord.x,
+			y: coord.y,
+			d: coord.d
+		};
+		tdRotateCamera(origin.d);
+	} else {
 		themeOverride = '';
-		var f = (Math.floor(Math.random() * 100000) - 50000) * 10 + 5;
-		var x = (Math.floor(Math.random() * 100000) - 50000) * 100 + 50;
-		var y = (Math.floor(Math.random() * 100000) - 50000) * 100 + 50;
+		var f = (Math.floor(Math.random() * 100000) - 50000) * floorSize + floorSize / 2;
+		var x = (Math.floor(Math.random() * 100000) - 50000) * viewSize + viewSize / 2;
+		var y = (Math.floor(Math.random() * 100000) - 50000) * viewSize + viewSize / 2;
 		var d = Math.floor(Math.random() * 4);
 		origin = { f: f, x: x, y: y, d: d };
-		setCookie('playercoordinates', 'F: ' + origin.f + ', X: ' + origin.x + ', Y: ' + origin.y + ', D: ' + origin.d);
-	} else {
-		origin = parseCoordinates(str);
-		tdRotateCamera(origin.d);
+		setCoords(origin);
 	}
 }
 
@@ -444,7 +449,7 @@ function generateFloor(x, y) {
 
 function generateStairs(x, y) {
 	if ((x + y).mod(2) === 1) {
-		if (rand(origin.f, x, y, 0, 10) === 0 && origin.f.mod(10) !== 9) { //up
+		if (rand(origin.f, x, y, 0, 20) === 0 && origin.f.mod(floorSize) !== floorSize - 1) { //up
 			if ((x.mod(8) === 0 && y.mod(8) === 7) || (x.mod(8) === 4 && y.mod(8) === 3)) {
 				var d = 2;
 			} else if ((x.mod(8) === 1 && y.mod(8) === 0) || (x.mod(8) === 5 && y.mod(8) === 4)) {
@@ -458,7 +463,7 @@ function generateStairs(x, y) {
 				d1 = (d + 1) % 4;
 				d2 = (d + 2) % 4;
 				d3 = (d + 3) % 4;
-				if (((d === 2 && y.mod(100) > 3) || (d === 0 && y.mod(100) < 97) || (d === 1 && x.mod(100) > 3) || (d === 3 && x.mod(100) < 97)) && setSquare(x, y, 'stairs-up', null, d, true)) {
+				if (((d === 2 && y.mod(viewSize) > 3) || (d === 0 && y.mod(viewSize) < viewSize - 3) || (d === 1 && x.mod(viewSize) > 3) || (d === 3 && x.mod(viewSize) < viewSize - 3)) && setSquare(x, y, 'stairs-up', null, d, true)) {
 					setSquareFeature(x, y, 'protected', 'true');
 					setSquareFeature(x, y, 'double', 'ceil');
 					setSquare(x + dir[d1].x, y + dir[d1].y, 'wall', null, '0', true, { double: 'wall', triple: 'wall', protected: true });
@@ -480,7 +485,7 @@ function generateStairs(x, y) {
 				}
 			}
 		}
-		if (rand(origin.f - 1, x, y, 0, 10) === 0 && origin.f.mod(10) !== 0) { //down
+		if (rand(origin.f - 1, x, y, 0, 20) === 0 && origin.f.mod(floorSize) !== 0) { //down
 			if ((x.mod(8) === 0 && y.mod(8) === 7) || (x.mod(8) === 4 && y.mod(8) === 3)) {
 				var d = 0;
 			} else if ((x.mod(8) === 1 && y.mod(8) === 0) || (x.mod(8) === 5 && y.mod(8) === 4)) {
@@ -496,7 +501,7 @@ function generateStairs(x, y) {
 				d3 = (d + 3) % 4;
 				var x1 = x + dir[d].x * 2;
 				var y1 = y + dir[d].y * 2;
-				if (((d === 2 && y1.mod(100) > 3) || (d === 0 && y1.mod(100) < 97) || (d === 1 && x1.mod(100) > 3) || (d === 3 && x1.mod(100) < 97)) && setSquare(x1, y1, 'stairs-down', null, d2, true, { double: 'wall', protected: true })) {
+				if (((d === 2 && y1.mod(viewSize) > 3) || (d === 0 && y1.mod(viewSize) < viewSize - 3) || (d === 1 && x1.mod(viewSize) > 3) || (d === 3 && x1.mod(viewSize) < viewSize - 3)) && setSquare(x1, y1, 'stairs-down', null, d2, true, { double: 'wall', protected: true })) {
 					setSquare(x1 + dir[d1].x, y1 + dir[d1].y, 'wall', null, '0', true);
 					setSquare(x1 + dir[d2].x, y1 + dir[d2].y, 'wall', null, '0', true);
 					setSquare(x1 + dir[d3].x, y1 + dir[d3].y, 'wall', null, '0', true);
@@ -510,10 +515,10 @@ function generateStairs(x, y) {
 		}
 	}
 	if (x.mod(4) === 2 && y.mod(4) === 2) {
-		if (rand(origin.f, x, y, 0, 10) === 0 && origin.f.mod(10) !== 9) { //up
+		if (rand(origin.f, x, y, 0, floorSize) === 0 && origin.f.mod(floorSize) !== floorSize - 1) { //up
 			appendSquare(x, y, 'pit-ceil', '', '', true);
 		}
-		if (rand(origin.f - 1, x, y, 0, 10) === 0 && origin.f.mod(10) !== 0) { //down
+		if (rand(origin.f - 1, x, y, 0, floorSize) === 0 && origin.f.mod(floorSize) !== 0) { //down
 			appendSquare(x, y, 'pit', 'floor', '', true);
 		}
 	}
@@ -564,12 +569,12 @@ function generateStairs(x, y) {
 						if (rand(origin.f, x, y, 283.01, 2) === 0) {
 							setSquare(x, y, 'floor,teleport', '', '', false, {
 								teleport: {
-									x: Math.floor(origin.x / 100) * 100 + rand(origin.f, x, y, 811.44, 49) * 2 + 2,
-									y: Math.floor(origin.y / 100) * 100 + rand(origin.f, x, y, 12.97, 49) * 2 + 2
+									x: Math.floor(origin.x / viewSize) * viewSize + rand(origin.f, x, y, 811.44, viewSize / 2 - 1) * 2 + 2,
+									y: Math.floor(origin.y / viewSize) * viewSize + rand(origin.f, x, y, 12.97, viewSize / 2 - 1) * 2 + 2
 								},
 								double: db
 							});
-						} else if (origin.f.mod(10) !== 0) {
+						} else if (origin.f.mod(floorSize) !== 0) {
 							setSquare(x, y, 'floor,teleport-up', '', '', false, {
 								teleport: {
 									f: origin.f + 1
@@ -682,11 +687,11 @@ function generateRoomAfter(x, y) {
 }
 
 function generateWindow(x, y) {
-	if (x.mod(100) === 0 || y.mod(100) === 0) {
+	if (x.mod(viewSize) === 0 || y.mod(viewSize) === 0) {
 		setSquare(x, y, '', null, '0', true);
-	} else if (x.mod(100) === 1 || y.mod(100) === 1 || x.mod(100) === 99 || y.mod(100) === 99) {
+	} else if (x.mod(viewSize) === 1 || y.mod(viewSize) === 1 || x.mod(viewSize) === viewSize - 1 || y.mod(viewSize) === viewSize - 1) {
 		setSquare(x, y, 'wall', null, '0', true, { double: 'wall', triple: 'wall' });
-	} else if (origin.f.mod(10) === 5 && x.mod(100) === 50 && y.mod(100) === 50) {
+	} else if (origin.f.mod(floorSize) === floorSize / 2 && x.mod(viewSize) === viewSize / 2 && y.mod(viewSize) === viewSize / 2) {
 		setSquare(x, y, 'floor,rune', null, '00', true);
 		setSquare(x - 1, y, 'floor', null, '0', true);
 		setSquare(x + 1, y, 'floor', null, '0', true);
@@ -1359,6 +1364,30 @@ function getCookie(cname) {
 	return cvalue;
 }
 
+function setCoords(coord) {
+	let coordString = 'f=' + coord.f + '&x=' + coord.x + '&y=' + coord.y + '&d=' + coord.d;
+	window.history.replaceState({ path: window.location.origin }, '', window.location.origin + '?' + coordString);
+}
+
+function getCoords() {
+	return {
+		f: parseInt(getParameterByName('f')),
+		x: parseInt(getParameterByName('x')),
+		y: parseInt(getParameterByName('y')),
+		d: parseInt(getParameterByName('d'))
+	}
+}
+
+function getParameterByName(name, url) {
+	if (!url) url = window.location.href;
+	name = name.replace(/[\[\]]/g, '\\$&');
+	var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+		results = regex.exec(url);
+	if (!results) return null;
+	if (!results[2]) return '';
+	return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
 function requestFullscreen() {
 	var con = document.getElementById('view');
 	if (con.requestFullscreen) {
@@ -1468,8 +1497,8 @@ function toMapCoord(x, y) {
 }
 
 function toRealCoord(x, y) {
-	var x1 = Math.floor(origin.x / 100) * 100 + x.mod(100);
-	var y1 = Math.floor(origin.y / 100) * 100 + y.mod(100);
+	var x1 = Math.floor(origin.x / viewSize) * viewSize + x.mod(viewSize);
+	var y1 = Math.floor(origin.y / viewSize) * viewSize + y.mod(viewSize);
 	return { x: x1, y: y1 };
 }
 
