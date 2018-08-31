@@ -7,97 +7,56 @@ var tdScreenHeight = 600;
 var vertexShader = document.getElementById('vertexShaderDepth').textContent;
 var fragmentShader = document.getElementById('fragmentShaderDepth').textContent;
 var reflectionCube, imageLoader;
-// var themeList = [
-// '',
-// 'stone+OR+brick',
-// 'nature+OR+natural',
-// 'old+OR+medieval+OR+vintage+OR+castle+OR+kingdom',
-// 'metal+OR+iron+OR+industrial',
-// 'sand+OR+egypt+OR+desert',
-// 'fabric+OR+cloth',
-// 'rock+OR+rustic+OR+concrete',
-// 'fantasy+OR+magic+OR+rpg',
-// 'scifi+OR+space+OR+science+OR+alien+OR+technical+OR+tech+OR+alien+OR+futuristic+OR+future',
-// 'granite+OR+marble+OR+smooth',
-// 'city+OR+urban+OR+street+OR+outdoor',
-// 'skyrim+OR+warcraft+OR+doom+OR+game'
-// ];
 var themeOverride = '';
-var themeColorList = [
-	'',
-	// '',
-	// '',
-	// '',
-	// '',
-	// '',
-	// '',
-	// '',
-	// '',
-	// '',
-	// '',
-	// '',
-	// 'red',
-	// 'orange',
-	// 'yellow',
-	// 'green',
-	// 'teal',
-	// 'blue',
-	// 'purple',
-	// 'pink',
-	// 'white',
-	// 'gray',
-	// 'black',
-	// 'brown'
-];
 var imageId = {
 	'wall': {
 		'id': '+texture+wall',
-		'max': 100000 //37
+		'max': 1000000 //37
 	},
 	'wallSecret': {
 		'id': '+rune+OR+symbol',
 		'extra': 'ic:trans,itp:lineart',
-		'max': 100000 //6
+		'max': 1000000 //6
 	},
 	'wallWood': {
 		'id': '+texture+wall+OR+wood',
-		'max': 100000 //21
+		'max': 1000000 //21
 	},
 	'wallWoodDoor': {
 		'id': '+texture+wall+OR+wood+door+OR+gate+OR+portcullis',
-		'max': 100000 //21
+		'max': 1000000 //21
 	},
 	'door': {
 		'id': '+texture+door+OR+gate+OR+portcullis',
-		'max': 100000 //21
+		'max': 1000000 //21
 	},
 	'floor': {
 		'id': '+texture+floor+OR+ceiling+OR+ground',
-		'max': 100000 //33
+		'max': 1000000 //33
 	},
 	'ceiling': {
 		'id': '+texture+ceiling+OR+floor+OR+plafond',
-		'max': 100000 //33
+		'max': 1000000 //33
 	},
 	'teleport': {
 		'id': '+sparkles+OR+particles+OR+glitters+OR+dust+-cosmetics',
 		'extra': 'ic:trans',
-		'max': 100000 //4
+		'max': 1000000 //4
 	},
 	'wallSwitch': {
 		'id': '+switch+OR+button+OR+lever',
 		'extra': 'ic:trans,itp:clipart',
-		'max': 100000 //9
+		'max': 1000000 //9
 	},
 	'wallDeco': {
-		'id': '+decoration+wall', //+wall+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+grass+OR+moss+OR+cracks+OR+painting+OR+banner
+		'id': '+decoration+texture', //+wall+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+grass+OR+moss+OR+cracks+OR+painting+OR+banner
 		'extra': 'ic:trans,itp:photo',
-		'max': 100000 //23
+		'max': 1000000 //23
 	},
 	'floorDeco': {
-		'id': '+decoration+floor+OR+ceiling', //+floor+OR+ground+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+cracks+OR+grate
+		'id': '+decoration+texture+floor+OR+ceiling', //+floor+OR+ground+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+cracks+OR+grate
 		'extra': 'ic:trans,itp:photo',
-		'max': 100000 //10
+		'max': 1000000 //10
 	},
 	'obstacle': {
 		'id': 'obstacle',
@@ -110,12 +69,12 @@ var imageId = {
 	'window': {
 		'id': '+',
 		'extra': 'ic:color',
-		'max': 100000
+		'max': 1000000
 	},
 	'rune': {
 		'id': '+',
 		'extra': 'ic:trans,itp:lineart',
-		'max': 100000
+		'max': 1000000
 	},
 	'trace': {
 		'id': 'trace',
@@ -651,17 +610,14 @@ function tdCreateMaterial(ob, i) {
 			if (image.id.indexOf('+') === 0) {
 				(function (ob, i) {
 					setTimeout(function () { //GOOGLE STARTS HERE!!!
-						const themeRand = rand(Math.floor(origin.f / floorSize), 0, 0, 712.83, themeList.length);
-						const themeColorRand = rand(Math.floor(origin.f / floorSize), 0, 0, 299.11, themeColorList.length);
-						themeOverride = themeOverride || themeList[themeRand];
-						let themeColor = (themeColorList[themeColorRand] === '') ? '' : ',ic:specific,isc:' + themeColorList[themeColorRand];
-						themeColor = image.extra ? ',' + image.extra : themeColor;
+						// const themeRand = rand(Math.floor(origin.f / floorSize), 0, 0, 712.83, themeList.length);
+						// themeOverride = themeOverride || themeList[themeRand];
 						const themePath = themeOverride.replace(/^(?:(.*?\+.*?\+.*?)\+.*?)$|^([^\+]*?)$/g, '$1$2') || 'any';
 						const imageId = image.id.replace(/^\+/, '') || 'any';
-						const tdPath = '/' + themePath + '/' + imageId + '/' + (themeColorList[themeColorRand] || 'any') + '/' + i; //+ '.png'
-						const uri = '/search?q=' + themeOverride + image.id + '+-minecraft&tbs=isz:ex,iszw:512,iszh:512' + themeColor + '&tbm=isch&tdPath=' + tdPath; //ift:png,
+						const tdPath = '/' + themePath + '/' + imageId + '/' + i; //+ '.png'
+						const uri = '/search?q=' + themeOverride + image.id + '+-minecraft&tbs=isz:ex,iszw:512,iszh:512&tbm=isch&tdPath=' + tdPath; //ift:png,
 						tdGetImageData(uri, ob, i, reflection);
-						$('body #theme').val(themeOverride);
+						setTheme();
 					}, 1);
 				})(ob, i);
 			} else {

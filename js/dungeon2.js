@@ -113,16 +113,19 @@ $(function () {
 
 	$('body #coordinates').on('change', function () {
 		origin = parseCoordinates($(this).val());
+		themeOverride = coordsToTheme();
 		reloadAll();
 	});
 
-	$('body #theme').change(function () {
-		initPlayer(true);
+	$('body #theme').on('change', function () {
 		let val = $(this).val();
 		val = val.replace(/\W/g, ' ');
 		val = val.replace(/\s+/g, '+');
 		val = val.replace(/\+or\+/gi, '+OR+');
+		val = val.replace(/(.{16}).*/gi, '$1');
 		themeOverride = val;
+		resetPlayer();
+		origin = themeToCoords();
 		reloadAll();
 	});
 	$('body #theme').focusin(function () {
@@ -260,28 +263,66 @@ function parseCoordinates(str) {
 	return or;
 }
 
+function setTheme() {
+	if ($('body #theme').val() !== themeOverride) {
+		$('body #theme').val(themeOverride);
+	}
+}
+
+function themeToCoords() {
+	const theme = themeOverride.length < 3 ? (themeOverride + '   ').substring(0, 3) : themeOverride;
+	let coordString = '';
+	for (let i = 0; i < theme.length; i++) {
+		const themeChar = theme.charCodeAt(i) - 32;
+		coordString = coordString + ('00' + themeChar).slice(-2);
+	}
+	const l = coordString.length;
+	const themeSplit = {
+		x: parseInt(coordString.slice(0, Math.floor(l * 0.35))) * viewSize + (origin.x % viewSize),
+		y: parseInt(coordString.slice(Math.floor(l * 0.35), Math.floor(l * 0.7))) * viewSize + (origin.y % viewSize),
+		f: parseInt(coordString.slice(Math.floor(l * 0.7))) * floorSize + (origin.f % floorSize),
+		d: origin.d
+	};
+	console.log('T2C:', themeOverride, themeSplit);
+	return themeSplit;
+}
+
+function coordsToTheme() {
+	let x = Math.floor(origin.x / viewSize);
+	let y = Math.floor(origin.y / viewSize);
+	let f = Math.floor(origin.f / floorSize);
+	x = x < 10 ? '0' + x : '' + x;
+	y = y < 10 ? '0' + y : '' + y;
+	f = f < 10 ? '0' + f : '' + f;
+	const themeInt = x + y + f;
+	let theme = '';
+	for (let i = 0; i < themeInt.length; i += 2) {
+		theme = theme + String.fromCharCode(parseInt(themeInt.substring(i, i + 2)) + 32);
+	}
+	console.log('C2T:', origin, theme);
+	return theme;
+}
+
 function initPlayer(force = false) {
-	var str = '';
 	let coord = {};
 	if (!force) {
 		coord = getCoords();
 	}
-	console.log(force, JSON.stringify(coord));
-	if (coord && coord.f) {
+	if (coord && coord.f) { //custom
 		origin = {
 			f: coord.f,
 			x: coord.x,
 			y: coord.y,
 			d: coord.d
 		};
+		themeOverride = coordsToTheme();
 		tdRotateCamera(origin.d);
-	} else {
-		themeOverride = '';
-		var f = (Math.floor(Math.random() * 100000) - 50000) * floorSize + floorSize / 2;
-		var x = (Math.floor(Math.random() * 100000) - 50000) * viewSize + viewSize / 2;
-		var y = (Math.floor(Math.random() * 100000) - 50000) * viewSize + viewSize / 2;
-		var d = Math.floor(Math.random() * 4);
-		origin = { f: f, x: x, y: y, d: d };
+	} else { //random
+		const themeRand = Math.floor(Math.random() * themeList.length);
+		themeOverride = themeList[themeRand];
+		resetPlayer();
+		origin = themeToCoords();
+		origin.d = Math.floor(Math.random() * 4);
 		setCoords(origin);
 	}
 }
@@ -316,6 +357,15 @@ function initField(callback) {
 			callback();
 		}
 	}, 1);*/
+}
+
+function resetPlayer() {
+	origin = {
+		f: Math.floor(floorSize / 2),
+		x: Math.floor(viewSize / 2),
+		y: Math.floor(viewSize / 2),
+		d: Math.floor(Math.random() * 4)
+	};
 }
 
 function shiftMeshes(d) {
@@ -411,6 +461,7 @@ function generateField(x1, y1, x2, y2) {
 	}
 	for (var y = y1; y < y2; y++) {
 		for (var x = x1; x < x2; x++) {
+			generateStart(x, y);
 			generateWindow(x, y);
 		}
 	}
@@ -686,17 +737,21 @@ function generateRoomAfter(x, y) {
 	}
 }
 
-function generateWindow(x, y) {
+function generateStart(x, y) {
 	if (x.mod(viewSize) === 0 || y.mod(viewSize) === 0) {
 		setSquare(x, y, '', null, '0', true);
 	} else if (x.mod(viewSize) === 1 || y.mod(viewSize) === 1 || x.mod(viewSize) === viewSize - 1 || y.mod(viewSize) === viewSize - 1) {
 		setSquare(x, y, 'wall', null, '0', true, { double: 'wall', triple: 'wall' });
-	} else if (origin.f.mod(floorSize) === floorSize / 2 && x.mod(viewSize) === viewSize / 2 && y.mod(viewSize) === viewSize / 2) {
+	} else if (origin.f.mod(floorSize) === Math.floor(floorSize / 2) && x.mod(viewSize) === Math.floor(viewSize / 2) && y.mod(viewSize) === Math.floor(viewSize / 2)) {
 		setSquare(x, y, 'floor,rune', null, '00', true);
 		setSquare(x - 1, y, 'floor', null, '0', true);
 		setSquare(x + 1, y, 'floor', null, '0', true);
 		setSquare(x, y - 1, 'floor', null, '0', true);
 		setSquare(x, y + 1, 'floor', null, '0', true);
+		setSquare(x - 2, y, 'floor', null, '0');
+		setSquare(x + 2, y, 'floor', null, '0');
+		setSquare(x, y - 2, 'floor', null, '0');
+		setSquare(x, y + 2, 'floor', null, '0');
 		setSquare(x - 1, y - 1, 'floor,wall-wood,wall-wood', null, '030', true);
 		setSquare(x + 1, y - 1, 'floor,wall-wood,wall-wood', null, '001', true);
 		setSquare(x - 1, y + 1, 'floor,wall-wood,wall-wood', null, '023', true);
@@ -714,6 +769,9 @@ function generateWindow(x, y) {
 			setSquare(x + 1, y, 'floor,door-wood', null, '01', true);
 		}
 	}
+}
+
+function generateWindow(x, y) {
 	if (Math.abs(x + y) % 2 === 1) {
 		if (hasSquare(x, y, 'wall') > -1 && hasSquare(x, y, 'wall-deco-high') === -1 && hasSquare(x, y, 'wall-light-high') === -1 && getSquareFeature(x, y, 'double') === 'wall') {
 			if (getSquareFeature(x - 1, y, 'double') === 'ceil' && getSquareFeature(x + 1, y, 'double') === 'ceil' && rand(origin.f, x, y, 91.11, 1) === 0) {

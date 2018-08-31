@@ -192,9 +192,13 @@
 			color: #fff;
 			background-color: #024;
 			border: solid 1px #024;
-			width: 25%;
+			width: 35%;
 			margin: 10px 0 0;
 			height: 32px;
+		}
+
+		#theme {
+			width: 30%;
 		}
 
 		#stats {
@@ -204,6 +208,7 @@
 
 		input[type=text],
 		input[type=button] {
+			font-size: 12px;
 			border: none;
 			padding: 0 10px;
 			line-height: 32px;
@@ -223,9 +228,9 @@
 		</div>
 		<canvas id="view"></canvas>
 		<div id="footer">
-			<input type="text"
+			<!-- <input type="text"
 			 id="coordinates"
-			 value="">&nbsp;
+			 value="">&nbsp; -->
 			<input type="text"
 			 id="theme"
 			 value="">&nbsp;
@@ -237,7 +242,7 @@
 			 value="Random">&nbsp;
 			<input type="button"
 			 id="stereo"
-			 value="Stereo view">
+			 value="AR">
 			<br>
 			<p style="color: #fff;"
 			 id="debug"></p>
@@ -273,7 +278,6 @@
  src="js/dungeon2.js"></script>
 <script type="text/javascript"
  src="js/threedee2.js"></script>
-<!--<script type="text/javascript" src="js/texture.js"></script>-->
 <script type="text/javascript">
 	$(window).on('beforeunload', function () {
 		saveGame(0, 'autosave');

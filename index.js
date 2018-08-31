@@ -5,6 +5,7 @@ const path = require('path');
 const mkdirp = require('mkdirp');
 const https = require('https');
 const express = require('express');
+const chalk = require('chalk');
 
 const baseDirectory = __dirname;
 
@@ -28,6 +29,7 @@ var mimetypes = {
 
 let pngPipeline = 0;
 let pngPipelineError = 0;
+let pngPipelineSuccess = 0;
 
 var rmdirRec = function (path) {
 	try {
@@ -53,9 +55,10 @@ const server = express()
 	.use(express.static(path.join(__dirname, 'public')))
 	.get('*', (req, res) => {
 		parseRequest(req, res);
-		// res.setTimeout(1000, function () {
-		// 	pngProgress('error');
-		// });
+		res.setTimeout(60000, function () {
+			pngProgress('error');
+			res.status(404).end();
+		});
 	})
 	.listen(port, () =>
 		console.log('Express is working on port ' + port)
@@ -68,26 +71,29 @@ function savePng(uri, dir, file, callback) {
 		const protocol = uri.indexOf('https://') > -1 ? https : uri.indexOf('http://') > -1 ? http : null;
 		if (protocol) {
 			protocol.get(uri, function (res) {
-				(function (file, callback) {
-					let dataPng = '';
-					res.setEncoding('binary');
-					res.on('data', (chunk) => {
-						dataPng += chunk;
-					});
-					res.on('end', () => {
-						fs.writeFile(dir + '/' + file, dataPng, 'binary', function (err) {
-							if (err) {
-								console.log('Error: ' + err.message);
-								callback(null);
-							} else {
-								callback(dataPng);
-							}
+				if (res.statusCode === 301 && res.headers.location && res.headers.location !== uri) { // image moved
+					savePng(res.headers.location, dir, file, callback);
+				} else {
+					(function (file, callback) {
+						let dataPng = '';
+						res.setEncoding('binary');
+						res.on('data', (chunk) => {
+							dataPng += chunk;
 						});
-					});
-				})(file, callback);
-
+						res.on('end', () => {
+							fs.writeFile(dir + '/' + file, dataPng, 'binary', function (err) {
+								if (err) {
+									//console.log('Error: ' + err.message);
+									callback(null);
+								} else {
+									callback(dataPng);
+								}
+							});
+						});
+					})(file, callback);
+				}
 			}).on('error', (err) => {
-				console.log('Error: ' + err.message);
+				//console.log('Error: ' + err.message);
 				callback(null);
 			});
 		} else {
@@ -134,15 +140,21 @@ function updateImageList(pth, imageList) {
 
 function pngProgress(text) {
 	if (text === 'error') {
-		//pngPipeline--;
-		//pngPipelineError++;
+		pngPipeline = pngPipeline > 0 ? pngPipeline - 1 : 0;
+		pngPipelineError++;
 	} else if (text === 'found') {
 		pngPipeline++;
 	} else if (text === 'saved') {
-		pngPipeline--;
+		pngPipeline = pngPipeline > 0 ? pngPipeline - 1 : 0;
+		pngPipelineSuccess++;
 	}
-	//console.log(pngPipeline, pngPipelineError);
-	process.stdout.write('IMAGE ' + text + ' ' + '.'.repeat(pngPipeline) + '\x1b[31m.\x1b[0m'.repeat(pngPipelineError) + ' \r');
+	let sameLine = pngPipeline === 0 ? '\n' : '\r';
+	var bar = '▉';
+	process.stdout.write('IMAGE ' + text + ' ' + chalk.green(bar.repeat(pngPipelineSuccess)) + chalk.gray(bar.repeat(pngPipeline)) + chalk.red(bar.repeat(pngPipelineError)) + ' ' + sameLine);
+	if (pngPipeline === 0) {
+		pngPipelineError = 0;
+		pngPipelineSuccess = 0;
+	}
 }
 
 function parseRequest(req, response) {
@@ -170,7 +182,7 @@ function parseRequest(req, response) {
 			if (notFound) {
 				mkdirp.sync(pth.dir);
 			}
-			response.header('Access-Control-Allow-Origin', '*');
+			// response.header('Access-Control-Allow-Origin', '*');
 			fs.access(pth.dir + '/' + pth.file, fs.constants.F_OK, (notFound) => {
 				if (notFound) {
 					if (imageList['i' + parseInt(pth.file)]) {
@@ -178,7 +190,9 @@ function parseRequest(req, response) {
 							fs.readFile(pth.dir + '/' + pth.file, function (er, dataPng) {
 								updateImageList(pth, imageList); // NOT existing image + Found in image list
 								pngProgress('saved');
-								response.header('image-reference-url', imageList['i' + pth.file]);
+								if (!response.headersSent) {
+									response.header('image-reference-url', imageList['i' + pth.file]);
+								}
 								response.status(200).end(dataPng);
 							});
 						});
@@ -200,12 +214,19 @@ function parseRequest(req, response) {
 							});
 							res.on('end', function () {
 								savePngs(pth, data, imageList, function (img, imageList) {
-									fs.readFile(pth.dir + '/' + pth.file, function (er, dataPng) {
-										pngProgress('saved');
-										updateImageList(pth, imageList); // NOT existing image + NOT found in image list
-										response.header('image-reference-url', imageList['i' + pth.file]);
-										response.status(200).end(dataPng);
-									});
+									if (img) {
+										fs.readFile(pth.dir + '/' + pth.file, function (er, dataPng) {
+											pngProgress('saved');
+											updateImageList(pth, imageList); // NOT existing image + NOT found in image list
+											if (!response.headersSent) {
+												response.header('image-reference-url', imageList['i' + pth.file]);
+											}
+											response.status(200).end(dataPng);
+										});
+									} else {
+										pngProgress('error');
+										response.status(404).end();
+									}
 								});
 							});
 							res.on('error', function (err) {
@@ -220,13 +241,20 @@ function parseRequest(req, response) {
 				} else {
 					fs.readFile(pth.dir + '/' + pth.file, function (er, dataPng) { // Existing image + Found in image list
 						pngProgress('saved');
-						response.header('image-reference-url', imageList['i' + pth.file]);
+						if (!response.headersSent) {
+							response.header('image-reference-url', imageList['i' + pth.file]);
+						}
 						response.status(200).end(dataPng);
 					});
 				}
 			});
 		});
 	} else {
+		if (fsPathName.indexOf('/index.html') > -1) {
+			pngPipeline = 0;
+			pngPipelineError = 0;
+			pngPipelineSuccess = 0;
+		}
 		response.writeHead(200, {
 			'Access-Control-Allow-Origin': '*',
 			'Content-Type': mimetype
