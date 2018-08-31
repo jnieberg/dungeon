@@ -107,8 +107,7 @@ $(function () {
 	});
 
 	$(document).on('click', function (event) {
-		buttonEvents(event);
-		return false;
+		return buttonEvents(event);
 	});
 
 	$('body #coordinates').on('change', function () {
@@ -134,10 +133,10 @@ $(function () {
 		keysFrozen = false;
 	});
 
-	$('body #random').on('click', function () {
-		initPlayer(true);
-		reloadAll();
-	});
+	// $('body #random').on('click', function () {
+	// 	initPlayer(true);
+	// 	reloadAll();
+	// });
 
 	$('body #reset-game').on('click', function () {
 		mutation = {};
@@ -1479,6 +1478,7 @@ function buttonEvents(event) {
 					tdSprite[s].mesh.material.opacity = 0;
 				}
 			}
+			return false;
 		}
 	} else if (isMobile) {
 		let canvas = $('#main');
@@ -1495,8 +1495,11 @@ function buttonEvents(event) {
 			case 3: tdMoveCamera(d3); break;
 			case 4: wallAction(origin.x, origin.y, d); break;
 			case 5: tdMoveCamera(d1); break;
+			default: break;
 		}
+		return false;
 	}
+	return true;
 }
 
 function getMutation(x, y) {

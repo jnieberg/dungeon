@@ -193,7 +193,7 @@
 			background-color: #024;
 			border: solid 1px #024;
 			width: 35%;
-			margin: 10px 0 0;
+			margin-top: 5px;
 			height: 32px;
 		}
 
@@ -207,7 +207,9 @@
 		}
 
 		input[type=text],
-		input[type=button] {
+		input[type=button],
+		.button {
+			display: inline-block;
 			font-size: 12px;
 			border: none;
 			padding: 0 10px;
@@ -216,6 +218,9 @@
 			color: #048;
 			background-color: #00ccff;
 			border-radius: 4px;
+			cursor: pointer;
+			text-decoration: none;
+			margin-right: 5px;
 		}
 	</style>
 </head>
@@ -233,14 +238,11 @@
 			 value="">&nbsp; -->
 			<input type="text"
 			 id="theme"
-			 value="">&nbsp;
-			<input type="button"
+			 value=""><input type="button"
 			 id="reset-game"
-			 value="Reset">&nbsp;
-			<input type="button"
+			 value="Reset"><a class="button"
 			 id="random"
-			 value="Random">&nbsp;
-			<input type="button"
+			 href="/">Random</a><input type="button"
 			 id="stereo"
 			 value="AR">
 			<br>

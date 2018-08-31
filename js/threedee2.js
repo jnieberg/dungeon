@@ -50,12 +50,12 @@ var imageId = {
 	},
 	'wallDeco': {
 		'id': '+decoration+texture', //+wall+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+grass+OR+moss+OR+cracks+OR+painting+OR+banner
-		'extra': 'ic:trans,itp:photo',
+		'extra': 'ic:trans',
 		'max': 1000000 //23
 	},
 	'floorDeco': {
 		'id': '+decoration+texture+floor+OR+ceiling', //+floor+OR+ground+decoration+OR+decorative+OR+blood+OR+hole+OR+slime+OR+dirt+OR+cracks+OR+grate
-		'extra': 'ic:trans,itp:photo',
+		'extra': 'ic:trans',
 		'max': 1000000 //10
 	},
 	'obstacle': {
@@ -614,8 +614,9 @@ function tdCreateMaterial(ob, i) {
 						// themeOverride = themeOverride || themeList[themeRand];
 						const themePath = themeOverride.replace(/^(?:(.*?\+.*?\+.*?)\+.*?)$|^([^\+]*?)$/g, '$1$2') || 'any';
 						const imageId = image.id.replace(/^\+/, '') || 'any';
+						imageExtra = image.extra ? ',' + image.extra : '';
 						const tdPath = '/' + themePath + '/' + imageId + '/' + i; //+ '.png'
-						const uri = '/search?q=' + themeOverride + image.id + '+-minecraft&tbs=isz:ex,iszw:512,iszh:512&tbm=isch&tdPath=' + tdPath; //ift:png,
+						const uri = '/search?q=' + themeOverride + image.id + '&tbs=isz:ex,iszw:512,iszh:512' + imageExtra + '&tbm=isch&tdPath=' + tdPath; //ift:png,
 						tdGetImageData(uri, ob, i, reflection);
 						setTheme();
 					}, 1);
