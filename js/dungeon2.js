@@ -1481,23 +1481,22 @@ function buttonEvents(event) {
 			return false;
 		}
 	} else if (isMobile) {
-		let canvas = $('#main');
-		let x = parseInt(event.clientX / canvas.outerWidth() * 3);
-		let y = parseInt(event.clientY / canvas.outerWidth() * 3);
+		let canvas = $('#view').get(0);
+		let x = parseInt(event.pageX / canvas.offsetWidth * 3);
+		let y = parseInt(event.pageY / canvas.offsetHeight * 2);
 		let index = x % 3 + y * 3;
 		let d = origin.d;
 		let d1 = (origin.d + 1) % 4;
 		let d3 = (origin.d + 3) % 4;
 		switch (index) {
-			case 0: tdRotateCamera(-1); break;
-			case 1: tdMoveCamera(d); break;
-			case 2: tdRotateCamera(1); break;
-			case 3: tdMoveCamera(d3); break;
-			case 4: wallAction(origin.x, origin.y, d); break;
-			case 5: tdMoveCamera(d1); break;
+			case 0: tdRotateCamera(-1); return false;
+			case 1: tdMoveCamera(d); return false;
+			case 2: tdRotateCamera(1); return false;
+			case 3: tdMoveCamera(d3); return false;
+			case 4: wallAction(origin.x, origin.y, d); return false;
+			case 5: tdMoveCamera(d1); return false;
 			default: break;
 		}
-		return false;
 	}
 	return true;
 }
