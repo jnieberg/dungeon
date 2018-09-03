@@ -49,10 +49,14 @@ var rmdirRec = function (path) {
 	}
 };
 
-rmdirRec(path.resolve('images/_backup'));
+clearAll();
 
 const server = express()
 	.use(express.static(path.join(__dirname, 'public')))
+	.get('/reset', (req, res) => {
+		clearAll();
+		res.redirect('/');
+	})
 	.get('*', (req, res) => {
 		parseRequest(req, res);
 		res.setTimeout(60000, function () {
@@ -65,6 +69,10 @@ const server = express()
 	);
 
 server.timeout = 60000;
+
+function clearAll() {
+	rmdirRec(path.resolve('images/_backup'));
+}
 
 function savePng(uri, dir, file, callback) {
 	(function (uri, dir, file, callback) {

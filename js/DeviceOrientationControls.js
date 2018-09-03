@@ -47,7 +47,7 @@ THREE.DeviceOrientationControls = function (object) {
 			quaternion.setFromEuler(euler); // orient the device
 			quaternion.multiply(q1); // camera looks out the back of the device, not the top
 			quaternion.multiply(q0.setFromAxisAngle(zee, -orient)); // adjust for screen orientation
-		}
+		};
 	}();
 
 	this.connect = function () {
@@ -64,14 +64,16 @@ THREE.DeviceOrientationControls = function (object) {
 	};
 
 	this.update = function () {
-		if (scope.enabled === false) return;
+		if (scope.enabled === false) {
+			return;
+		}
 		var alpha = scope.deviceOrientation.alpha ? THREE.Math.degToRad(scope.deviceOrientation.alpha) + this.alphaOffsetAngle : 0; // Z
 		var beta = scope.deviceOrientation.beta ? THREE.Math.degToRad(scope.deviceOrientation.beta) : 0; // X'
 		var gamma = scope.deviceOrientation.gamma ? THREE.Math.degToRad(scope.deviceOrientation.gamma) : 0; // Y''
 		var orient = scope.screenOrientation ? THREE.Math.degToRad(scope.screenOrientation) : 0; // O
 		setObjectQuaternion(scope.object.quaternion, alpha, beta, gamma, orient);
 		this.alpha = alpha;
-		//tdMoveCameraXY(scope.object.rotation.y, scope.object.rotation.x, scope.object.rotation.z, true);
+		//	tdMoveCameraXY(scope.object.rotation.y, scope.object.rotation.x, scope.object.rotation.z, true);
 		pitchObject.rotation.x = scope.object.rotation.x;
 		yawObject.rotation.y = scope.object.rotation.y;
 		rollObject.rotation.z = scope.object.rotation.z;

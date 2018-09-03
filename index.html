@@ -206,6 +206,10 @@
 			right: 0;
 		}
 
+		#stereo {
+			display: none;
+		}
+
 		input[type=text],
 		input[type=button],
 		.button {
@@ -238,9 +242,9 @@
 			 value="">&nbsp; -->
 			<input type="text"
 			 id="theme"
-			 value=""><input type="button"
+			 value=""><a class="button"
 			 id="reset-game"
-			 value="Reset"><a class="button"
+			 href="/reset">Reset</a><a class="button"
 			 id="random"
 			 href="/">Random</a><input type="button"
 			 id="stereo"
@@ -277,7 +281,11 @@
 	}
 </script>
 <script type="text/javascript"
+ src="js/dungeonVars.js"></script>
+<script type="text/javascript"
  src="js/dungeon2.js"></script>
+<script type="text/javascript"
+ src="js/threedeeVars.js"></script>
 <script type="text/javascript"
  src="js/threedee2.js"></script>
 <script type="text/javascript">
