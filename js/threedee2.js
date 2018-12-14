@@ -1705,26 +1705,33 @@ function tdGetSpriteOpacity(id) {
 		var canvas = document.getElementById('view');
 		var cx = canvas.width;
 		var cy = canvas.height;
-		var vector = new THREE.Vector3();
+		var vector = new THREE.Vector3(0, 0, 0);
 		vector.setFromMatrixPosition(tdSprite[id].mesh.matrixWorld);
-		xy = tdCreateVector(vector.x, vector.y, vector.z, camera, cx, cy);
-		op = Math.abs(xy.x - 0.5 * cx) / (cx / 24.0);
-		op = op + Math.abs(xy.y - 0.5 * cy) / (cy / 12.0);
+		xy = tdCreateVector(vector, camera, cx, cy);
+		op = Math.abs(xy.x - 0.5 * cx) / (cx / 5);
+		console.log(op);
+		op = op + Math.abs(xy.y - 0.5 * cy) / (cy / 5);
 		if (op > 1.0) op = 1.0;
 		if (op < 0.0) op = 0.0;
 		op = 1.0 - op;
+		// var op = Math.abs(((camera.rotation.y / Math.PI + 1.25) % 0.5) - 0.25);
+		// op = op + Math.abs(((camera.rotation.x / Math.PI + 1.25) % 0.5) - 0.25);
+		// op = 1 - op * 10;
+		// if (op > 1.0) op = 1.0;
+		// if (op < 0.0) op = 0.0;
+		// console.log(op);
 	}
 	return op;
 }
 
-function tdCreateVector(x, y, z, camera, width, height) {
-	var p = new THREE.Vector3(x, y, z);
-	var vector = p.project(camera);
-
-	vector.x = (vector.x + 1) / 2 * width;
-	vector.y = -(vector.y - 1) / 2 * height;
-
-	return vector;
+function tdCreateVector(vector, camera, width, height) {
+	var p = new THREE.Vector3(vector.x, vector.y, vector.z);
+	var dir = p.project(camera);
+	dir.x = (dir.x + 1) / 2 * width;
+	dir.y = -(dir.y - 1) / 2 * height;
+	// var arrowHelper = new THREE.ArrowHelper(dir, vector, 1, 0xff0000);
+	// scene.add(arrowHelper);
+	return dir;
 }
 
 function tdRotateInWorld(axis, object, radians) {

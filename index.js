@@ -27,6 +27,12 @@ var mimetypes = {
 	'.woff2': 'text/plain'
 };
 
+var magicImageNumbers = {
+	jpg: 'ffd8ffe0',
+	png: '89504e47',
+	gif: '47494638'
+};
+
 let pngPipeline = 0;
 let pngPipelineError = 0;
 let pngPipelineSuccess = 0;
@@ -38,11 +44,11 @@ var rmdirRec = function (path) {
 				var curPath = path + '/' + file;
 				if (fs.lstatSync(curPath).isDirectory()) { // recurse
 					rmdirRec(curPath);
-				} else { // delete file
+				} else if (file !== '_images.json') { // delete file
 					fs.unlinkSync(curPath);
 				}
 			});
-			fs.rmdirSync(path);
+			//fs.rmdirSync(path);
 		}
 	} catch (e) {
 
@@ -89,14 +95,25 @@ function savePng(uri, dir, file, callback) {
 							dataPng += chunk;
 						});
 						res.on('end', () => {
-							fs.writeFile(dir + '/' + file, dataPng, 'binary', function (err) {
-								if (err) {
-									//console.log('Error: ' + err.message);
-									callback(null);
-								} else {
-									callback(dataPng);
-								}
-							});
+							var magicImageNumbersInBody =
+								dataPng.charCodeAt(0).toString(16) +
+								dataPng.charCodeAt(1).toString(16) +
+								dataPng.charCodeAt(2).toString(16) +
+								dataPng.charCodeAt(3).toString(16);
+							if (magicImageNumbersInBody === magicImageNumbers.jpg ||
+								magicImageNumbersInBody === magicImageNumbers.png ||
+								magicImageNumbersInBody === magicImageNumbers.gif) {
+								fs.writeFile(dir + '/' + file, dataPng, 'binary', function (err) {
+									if (err) {
+										//console.log('Error: ' + err.message);
+										callback(null);
+									} else {
+										callback(dataPng);
+									}
+								});
+							} else {
+								callback(dataPng);
+							}
 						});
 					})(file, callback);
 				}
@@ -190,14 +207,15 @@ function parseRequest(req, response) {
 			if (notFound) {
 				mkdirp.sync(pth.dir);
 			}
-			// response.header('Access-Control-Allow-Origin', '*');
+			response.header('Access-Control-Allow-Origin', '*');
+			response.header('vary', 'Accept-Encoding');
 			fs.access(pth.dir + '/' + pth.file, fs.constants.F_OK, (notFound) => {
 				if (notFound) {
 					if (imageList['i' + parseInt(pth.file)]) {
 						savePng(imageList['i' + parseInt(pth.file)], pth.dir, pth.file, function (png) {
-							fs.readFile(pth.dir + '/' + pth.file, function (er, dataPng) {
-								updateImageList(pth, imageList); // NOT existing image + Found in image list
+							fs.readFile(pth.dir + '/' + pth.file, function (err, dataPng) {
 								pngProgress('saved');
+								updateImageList(pth, imageList); // NOT existing image + Found in image list
 								if (!response.headersSent) {
 									response.header('image-reference-url', imageList['i' + pth.file]);
 								}
@@ -223,7 +241,7 @@ function parseRequest(req, response) {
 							res.on('end', function () {
 								savePngs(pth, data, imageList, function (img, imageList) {
 									if (img) {
-										fs.readFile(pth.dir + '/' + pth.file, function (er, dataPng) {
+										fs.readFile(pth.dir + '/' + pth.file, function (err, dataPng) {
 											pngProgress('saved');
 											updateImageList(pth, imageList); // NOT existing image + NOT found in image list
 											if (!response.headersSent) {
@@ -233,6 +251,10 @@ function parseRequest(req, response) {
 										});
 									} else {
 										pngProgress('error');
+										updateImageList(pth, imageList); // NO valid image + NOT found in image list
+										if (!response.headersSent) {
+											response.header('image-reference-url', imageList['i' + pth.file]);
+										}
 										response.status(404).end();
 									}
 								});
@@ -247,7 +269,7 @@ function parseRequest(req, response) {
 						}).end();
 					}
 				} else {
-					fs.readFile(pth.dir + '/' + pth.file, function (er, dataPng) { // Existing image + Found in image list
+					fs.readFile(pth.dir + '/' + pth.file, function (err, dataPng) { // Existing image + Found in image list
 						pngProgress('saved');
 						if (!response.headersSent) {
 							response.header('image-reference-url', imageList['i' + pth.file]);
