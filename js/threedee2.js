@@ -447,7 +447,7 @@ function tdCreateScene() {
 
 	camera = new THREE.PerspectiveCamera(45, canvas.width / canvas.height, 0.75, tdViewSize);
 
-	tdPlayer = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, tdPlayerHeight, 8, 1));
+	tdPlayer = new THREE.Mesh(new THREE.CylinderBufferGeometry(0.1, 0.1, tdPlayerHeight, 8, 1));
 	tdPlayer.castShadow = true;
 
 	scene = new THREE.Scene();

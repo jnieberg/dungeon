@@ -65,7 +65,7 @@ const server = express()
 	})
 	.get('*', (req, res) => {
 		parseRequest(req, res);
-		res.setTimeout(60000, function () {
+		res.setTimeout(30000, function () {
 			pngProgress('error');
 			res.status(404).end();
 		});
@@ -135,27 +135,37 @@ function unicodeToChar(text) {
 }
 
 function savePngs(pth, data, imageList, callback) {
-	const images = data.match(/"ou":".*?"/g) || [];
-	const imagesAlt = data.match(/"tu":".*?"/g) || [];
-	const imageIndex = parseInt(pth.file);
-	const i = imageIndex % images.length;
-	if (images.length && images[i]) {
-		let image = unicodeToChar(images[i].replace(/"ou":"(.*?)"/, '$1'));
-		if (image.indexOf('x-raw-image:///') === 0) {
-			image = unicodeToChar(imagesAlt[i].replace(/"tu":"(.*?)"/, '$1'));
-		}
-		savePng(image, pth.dir, pth.file, function (png) {
-			for (let im = 0; im < images.length; im++) {
-				let imageThis = unicodeToChar(images[im].replace(/"ou":"(.*?)"/, '$1'));
-				if (imageThis.indexOf('x-raw-image:///') === 0) {
-					imageThis = unicodeToChar(imagesAlt[im].replace(/"tu":"(.*?)"/, '$1'));
-				}
-				const imageIndexThis = Math.floor(parseInt(pth.file) / images.length) * images.length + im;
-				imageList['i' + imageIndexThis] = imageThis;
+	// const images = data.match(/"ou":".*?"/g) || [];
+	// const imagesAlt = data.match(/"tu":".*?"/g) || [];
+	let images = data.replace(/^[\w\W]*?AF_initDataCallback\({key: 'ds:1', isError:  false , hash: '2', data:([\w\W]*?)}\);[\w\W]*?$/g, '$1') || '{}';
+	try {
+		images = JSON.parse(images);
+		images = images[31][0][12][2].map(item => item[1] ? [item[1][2][0], item[1][3][0]] : ['', '']);
+		//fs.writeFile('_temp.json', JSON.stringify(images, null ,2), () => {});
+		const imageIndex = parseInt(pth.file);
+		const i = imageIndex % images.length;
+		if (images.length && images[i]) {
+			// let image = unicodeToChar(images[i].replace(/"ou":"(.*?)"/, '$1'));
+			let image = images[i][1];
+			if (image.indexOf('x-raw-image:///') === 0) { 
+				// image = unicodeToChar(imagesAlt[i].replace(/"tu":"(.*?)"/, '$1'));
+				image = images[i][0];
 			}
-			callback(png, imageList);
-		});
-	}
+			savePng(image, pth.dir, pth.file, function (png) {
+				for (let im = 0; im < images.length; im++) {
+					// let imageThis = unicodeToChar(images[im].replace(/"ou":"(.*?)"/, '$1'));
+					let imageThis = images[im][1];
+					if (imageThis.indexOf('x-raw-image:///') === 0) {
+						//imageThis = unicodeToChar(imagesAlt[im].replace(/"tu":"(.*?)"/, '$1'));
+						imageThis = images[im][0];
+					}
+					const imageIndexThis = Math.floor(parseInt(pth.file) / images.length) * images.length + im;
+					imageList['i' + imageIndexThis] = imageThis;
+				}
+				callback(png, imageList);
+			});
+		}
+	} catch(err) {}
 }
 
 function updateImageList(pth, imageList) {
